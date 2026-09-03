@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.mymail'
+version = '0.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['mail-api/main/java']
+        }
+        resources {
+            srcDirs = ['mail-api/main/resources']
+        }
+    }
+
+    test {
+        java {
+            srcDirs = ['mail-api/test/java']
+        }
+        resources {
+            srcDirs = ['mail-api/test/resources']
+        }
+    }
+}
