@@ -5,8 +5,13 @@ plugins {
 group = 'com.mymail'
 version = '0.1.0'
 
-repositories {
-    mavenCentral()
+allprojects {
+    group = 'com.mymail'
+    version = '0.1.0'
+
+    repositories {
+        mavenCentral()
+    }
 }
 
 java {
