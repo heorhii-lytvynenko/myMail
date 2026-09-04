@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: migrations/ddl/create-users.sql
+      relativeToChangelogFile: true

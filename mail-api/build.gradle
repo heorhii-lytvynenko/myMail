@@ -20,9 +20,42 @@ dependencies {
 
     runtimeOnly 'org.postgresql:postgresql'
 
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+def loadDotEnv = {
+    def envFile = rootProject.file('.env')
+
+    if (!envFile.exists()) {
+        return [:]
+    }
+
+    envFile.readLines()
+            .findAll { line ->
+                def trimmed = line.trim()
+                trimmed && !trimmed.startsWith('#') && trimmed.contains('=')
+            }
+            .collectEntries { line ->
+                def index = line.indexOf('=')
+                def key = line.substring(0, index).trim()
+                def value = line.substring(index + 1).trim()
+
+                if ((value.startsWith('"') && value.endsWith('"')) ||
+                        (value.startsWith("'") && value.endsWith("'"))) {
+                    value = value.substring(1, value.length() - 1)
+                }
+
+                [(key): value]
+            }
+}
+
+tasks.named('bootRun') {
+    environment loadDotEnv()
 }
