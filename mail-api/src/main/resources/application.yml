@@ -3,9 +3,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/mymail
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     open-in-view: false
