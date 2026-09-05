@@ -1,4 +1,7 @@
 spring:
+  application:
+    name: mymail-api
+
   datasource:
     url: jdbc:postgresql://localhost:5432/mymail
     username: ${DB_USERNAME}
@@ -8,3 +11,9 @@ spring:
     hibernate:
       ddl-auto: none
     open-in-view: false
+
+auth0:
+  domain: ${AUTH0_DOMAIN}
+  audience: ${AUTH0_API_IDENTIFIER}
+
+
