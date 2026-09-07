@@ -1,0 +1,23 @@
+openapi: 3.0.3
+
+info:
+  title: myMail API
+  version: 0.1.0
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/users/me:
+    $ref: './user/paths.yaml#/users_me'
+
+components:
+  schemas:
+    UserResponse:
+      $ref: './user/schemas.yaml#/UserResponse'
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

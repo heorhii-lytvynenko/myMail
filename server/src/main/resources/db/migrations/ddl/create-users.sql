@@ -3,11 +3,8 @@
 --changeset mymail:create-users
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY,
-    idp_id VARCHAR UNIQUE,
+    idp_id VARCHAR NOT NULL UNIQUE,
     email VARCHAR NOT NULL,
-    first_name VARCHAR NOT NULL,
-    last_name VARCHAR NOT NULL,
-    personal_id VARCHAR NOT NULL,
 
     created_at TIMESTAMPTZ NOT NULL,
     created_by VARCHAR NOT NUll,
@@ -17,6 +14,6 @@ CREATE TABLE IF NOT EXISTS users (
     deleted_by VARCHAR
 )
 
-CREATE UNIQUE INDEX IF NOT EXISTS consumers_email_unique
-ON consumers(LOWER(email))
+CREATE UNIQUE INDEX IF NOT EXISTS users_email_unique
+ON users(LOWER(email))
 WHERE deleted_at IS NULL;
