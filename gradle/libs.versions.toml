@@ -1,0 +1,47 @@
+[versions]
+springBoot = "4.1.0"
+springDependencyManagement = "1.1.7"
+openapiGenerator = "7.23.0"
+swagger = "2.2.49"
+springdoc = "3.0.3"
+jacksonDatabindNullable = "0.2.10"
+testcontainers = "1.20.4"
+lombok-plugin = "9.5.0"
+auth0 = "3.9.0"
+auth0SpringbootApi = "1.0.0-beta.0"
+postgresql = "42.7.8"
+mapstruct = "1.6.3"
+
+[libraries]
+spring-boot-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+spring-boot-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+
+springdoc = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
+
+auth0-springboot-api = { module = "com.auth0:auth0-springboot-api", version.ref = "auth0SpringbootApi" }
+auth0 = { module = "com.auth0:auth0", version.ref = "auth0" }
+
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+
+lombok = { module = "org.projectlombok:lombok" }
+
+swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "swagger" }
+swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "swagger" }
+
+springdoc-scalar = { module = "org.springdoc:springdoc-openapi-starter-webmvc-scalar", version.ref = "springdoc" }
+springdoc-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "springdoc" }
+
+jackson-databind-nullable = { module = "org.openapitools:jackson-databind-nullable", version.ref = "jacksonDatabindNullable" }
+
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }
+
+mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
+mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-dependencyManagement = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
+openapi-generator = { id = "org.openapi.generator", version.ref = "openapiGenerator" }
+lombok = { id = "io.freefair.lombok", version.ref = "lombok-plugin" }

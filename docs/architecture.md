@@ -152,7 +152,7 @@ The backend will interact with the following external systems:
 ```text
 Frontend
    ↓ HTTP/HTTPS
-mail-api
+server
    ├── PostgreSQL
    ├── IMAP
    ├── SMTP
@@ -181,7 +181,7 @@ The AI component may initially be integrated directly with the backend and may l
 
 The frontend is maintained in a separate repository.
 
-The frontend communicates with `mail-api` through HTTP/HTTPS APIs.
+The frontend communicates with `server` through HTTP/HTTPS APIs.
 
 The backend does not depend on the frontend implementation.
 
@@ -199,8 +199,8 @@ The initial deployment consists of a single backend application:
                              │
                              ▼
                  ┌───────────────────────┐
-                 │       mail-api        │
-                 │    Spring Boot App   │
+                 │       server          │
+                 │    Spring Boot App    │
                  │                       │
                  │ Authentication        │
                  │ User                  │

@@ -1,0 +1,11 @@
+UserResponse:
+  type: object
+  required:
+    - idpId
+    - email
+  properties:
+    idpId:
+      type: string
+    email:
+      type: string
+      format: email

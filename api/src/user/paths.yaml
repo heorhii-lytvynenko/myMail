@@ -1,0 +1,17 @@
+users_me:
+  get:
+    tags:
+      - Users
+    operationId: getCurrentUser
+    summary: Get current authenticated user
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Current authenticated user
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/UserResponse'
+      '401':
+        description: Unauthorized
