@@ -11,12 +11,14 @@ auth0 = "3.9.0"
 auth0SpringbootApi = "1.0.0-beta.0"
 postgresql = "42.7.8"
 mapstruct = "1.6.3"
+resend = "4.22.0"
 
 [libraries]
 spring-boot-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-boot-security = { module = "org.springframework.boot:spring-boot-starter-security" }
 spring-boot-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
 spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+resend = { module = "com.resend:resend-java", version.ref = "resend" }
 
 springdoc = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 

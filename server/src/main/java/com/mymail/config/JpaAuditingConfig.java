@@ -1,4 +1,4 @@
-package com.mymail.configuration;
+package com.mymail.config;
 
 import java.util.Optional;
 

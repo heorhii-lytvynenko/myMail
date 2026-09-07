@@ -5,13 +5,13 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: false
+  resend:
+    api-key: ${RESEND_API_KEY}
 
   datasource:
     url: jdbc:postgresql://localhost:5432/mymail
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-
-
 
 auth0:
   domain: ${AUTH0_DOMAIN}
