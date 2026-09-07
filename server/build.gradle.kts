@@ -25,6 +25,8 @@ dependencies {
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
 
+    implementation(libs.resend)
+
     runtimeOnly(libs.postgresql)
 
     compileOnly(libs.lombok)
