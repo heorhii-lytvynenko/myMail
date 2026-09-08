@@ -10,7 +10,42 @@ servers:
 paths:
   /api/users/me:
     $ref: './user/paths.yaml#/users_me'
-
+  /integrations/google/callback:
+    get:
+      tags:
+        - Google Integration
+      summary: Handle Google OAuth callback
+      operationId: googleOAuthCallback
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Google account connected successfully
+        '400':
+          description: Invalid OAuth callback
+  /integrations/google/connect:
+    get:
+      tags:
+        - Google Integration
+      summary: Connect Google account
+      description: Redirects the authenticated user to Google OAuth authorization.
+      operationId: connectGoogle
+      security:
+        - bearerAuth: []
+      responses:
+        '302':
+          description: Redirect to Google OAuth authorization page
+        '401':
+          description: User is not authenticated
 components:
   schemas:
     UserResponse:
