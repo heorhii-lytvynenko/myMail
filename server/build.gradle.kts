@@ -34,6 +34,8 @@ dependencies {
 
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
+    implementation(libs.spring.boot.starter.oauth2.resource.server)
+    implementation(libs.jakarta.mail)
 
     implementation(libs.resend)
 

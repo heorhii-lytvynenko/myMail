@@ -15,6 +15,7 @@ resend = "4.22.0"
 googleApiClient = "2.8.1"
 googleOauthClient = "1.39.0"
 googleGmail = "v1-rev20250630-2.0.0"
+jakartaMail = "2.0.1"
 
 [libraries]
 spring-boot-web = { module = "org.springframework.boot:spring-boot-starter-web" }
@@ -22,7 +23,8 @@ spring-boot-security = { module = "org.springframework.boot:spring-boot-starter-
 spring-boot-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
 spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 resend = { module = "com.resend:resend-java", version.ref = "resend" }
-
+spring-boot-starter-oauth2-resource-server = { module = "org.springframework.boot:spring-boot-starter-oauth2-resource-server" }
+jakarta-mail = { module = "com.sun.mail:jakarta.mail", version.ref = "jakartaMail" }
 google-api-client = { module = "com.google.api-client:google-api-client", version.ref = "googleApiClient" }
 google-oauth-client = { module = "com.google.oauth-client:google-oauth-client", version.ref = "googleOauthClient" }
 google-gmail = { module = "com.google.apis:google-api-services-gmail", version.ref = "googleGmail" }

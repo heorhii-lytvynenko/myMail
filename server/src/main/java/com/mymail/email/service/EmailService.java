@@ -1,14 +1,19 @@
 package com.mymail.email.service;
 
 import com.mymail.email.providers.EmailProvider;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class EmailService {
 
     private final EmailProvider emailProvider;
+
+    public EmailService(
+            @Qualifier("gmailEmailProvider") EmailProvider emailProvider
+    ) {
+        this.emailProvider = emailProvider;
+    }
 
     public void send(
             String to,

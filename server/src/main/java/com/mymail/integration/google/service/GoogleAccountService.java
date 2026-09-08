@@ -10,7 +10,9 @@ import com.google.api.services.gmail.model.Profile;
 import com.mymail.integration.google.entities.GoogleAccount;
 import com.mymail.integration.google.repository.GoogleAccountRepository;
 import com.mymail.user.entities.User;
+import com.mymail.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class GoogleAccountService {
     private final GoogleAccountRepository googleAccountRepository;
     private final OAuthStateService oauthStateService;
     private final GmailService gmailService;
+    private final UserService userService;
 
     @Transactional
     public void save(String state, GoogleTokenResponse response) {
@@ -102,5 +105,16 @@ public class GoogleAccountService {
                     e
             );
         }
+    }
+
+    public GoogleAccount getByAuthentication(Authentication authentication) {
+        User user = userService.getOrCreateUser(authentication);
+
+        return googleAccountRepository.findByUserId(user.getId())
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Google account is not connected"
+                        )
+                );
     }
 }
