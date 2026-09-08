@@ -16,6 +16,16 @@ springBoot {
 
 dependencies {
     implementation(project(":api"))
+
+    implementation(libs.mapstruct)
+    annotationProcessor(libs.mapstruct.processor)
+
+    implementation(libs.resend)
+
+    implementation(libs.google.api.client)
+    implementation(libs.google.oauth.client)
+    implementation(libs.google.gmail)
+
     implementation(libs.auth0.springboot.api)
     implementation(libs.spring.boot.web)
     implementation(libs.spring.boot.security)
