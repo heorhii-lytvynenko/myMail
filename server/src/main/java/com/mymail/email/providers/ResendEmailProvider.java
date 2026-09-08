@@ -2,11 +2,16 @@ package com.mymail.email.providers;
 
 
 import com.mymail.email.exception.EmailSendingException;
+
 import com.resend.Resend;
 import com.resend.core.exception.ResendException;
 import com.resend.services.emails.model.CreateEmailOptions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import com.mymail.email.model.EmailMessage;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,5 +33,10 @@ public class ResendEmailProvider implements EmailProvider {
         } catch (ResendException exception) {
             throw new EmailSendingException("Failed to send email", exception);
         }
+    }
+
+    @Override
+    public List<EmailMessage> getEmails() {
+        return List.of();
     }
 }

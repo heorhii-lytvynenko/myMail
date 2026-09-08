@@ -10,6 +10,7 @@ servers:
 paths:
   /api/users/me:
     $ref: './user/paths.yaml#/users_me'
+
   /integrations/google/callback:
     get:
       tags:
@@ -32,6 +33,7 @@ paths:
           description: Google account connected successfully
         '400':
           description: Invalid OAuth callback
+
   /integrations/google/connect:
     get:
       tags:
@@ -46,10 +48,37 @@ paths:
           description: Redirect to Google OAuth authorization page
         '401':
           description: User is not authenticated
+
+  /integrations/google/emails:
+    get:
+      tags:
+        - Google Integration
+      summary: Get Gmail emails
+      description: Retrieves emails from the authenticated user's connected Gmail account.
+      operationId: getGoogleEmails
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Gmail emails retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: './components/schemas.yaml#/EmailMessage'
+        '401':
+          description: User is not authenticated
+        '404':
+          description: Google account is not connected
+
 components:
   schemas:
     UserResponse:
       $ref: './user/schemas.yaml#/UserResponse'
+
+    EmailMessage:
+      $ref: './components/schemas.yaml#/EmailMessage'
 
   securitySchemes:
     bearerAuth:

@@ -1,0 +1,25 @@
+EmailMessage:
+  type: object
+  required:
+    - id
+    - threadId
+    - from
+    - subject
+    - body
+    - receivedAt
+  properties:
+    id:
+      type: string
+    threadId:
+      type: string
+    from:
+      type: string
+    to:
+      type: string
+    subject:
+      type: string
+    body:
+      type: string
+    receivedAt:
+      type: string
+      format: date-time
