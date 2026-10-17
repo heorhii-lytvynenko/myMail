@@ -1,9 +1,10 @@
-users_me:
+
+user:
   get:
     tags:
       - Users
-    operationId: getCurrentUser
     summary: Get current authenticated user
+    operationId: getCurrentUser
     security:
       - bearerAuth: []
     responses:
@@ -14,4 +15,50 @@ users_me:
             schema:
               $ref: './schemas.yaml#/UserResponse'
       '401':
-        description: Unauthorized
+        $ref: '../components/errors.yaml#/Unauthorized'
+
+login:
+  post:
+    tags:
+      - Authentication
+    summary: Authenticate user
+    operationId: login
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/LoginRequest'
+    responses:
+      '200':
+        description: Login successful
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/LoginResponse'
+      '401':
+        $ref: '../components/errors.yaml#/Unauthorized'
+
+signIn:
+  post:
+    tags:
+      - Authentication
+    operationId: signIn
+    summary: Register new user
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/SignInRequest'
+    responses:
+      '201':
+        description: User created successfully
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/SignInResponse'
+      '409':
+        description: User already exists

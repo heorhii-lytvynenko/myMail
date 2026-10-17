@@ -1,6 +1,6 @@
 package com.mymail.email.providers;
 
-import com.mymail.email.model.EmailMessage;
+import com.mymail.model.EmailMessage;
 
 import java.util.List;
 

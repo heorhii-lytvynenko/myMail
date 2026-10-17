@@ -1,6 +1,6 @@
 package com.mymail.email.providers;
 
-import com.mymail.email.model.EmailMessage;
+import com.mymail.model.EmailMessage;
 import com.mymail.integration.google.entities.GoogleAccount;
 import com.mymail.integration.google.service.GmailService;
 import com.mymail.integration.google.service.GoogleAccountService;

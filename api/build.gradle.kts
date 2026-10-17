@@ -1,3 +1,5 @@
+import javax.validation.constraints.Email
+
 plugins {
     java
     alias(libs.plugins.openapi.generator)
@@ -14,6 +16,8 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":domain"))
+
     implementation("org.springframework.boot:spring-boot-starter-web:4.1.0")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.20.0")
     implementation("io.swagger.core.v3:swagger-annotations:2.2.49")
@@ -48,6 +52,18 @@ openApiGenerate {
             "dateLibrary" to "java8"
         )
     )
+
+    importMappings.set(
+        mapOf(
+            "EmailMessage" to "com.mymail.model.EmailMessage"
+        )
+    )
+
+    schemaMappings.set(
+        mapOf(
+            "EmailMessage" to "EmailMessage"
+        )
+    )
 }
 
 sourceSets {
@@ -56,6 +72,10 @@ sourceSets {
             srcDir(layout.buildDirectory.dir("generated/src/main/java"))
         }
     }
+}
+
+tasks.named("openApiGenerate") {
+    inputs.dir("$projectDir/src")
 }
 
 tasks.named("compileJava") {

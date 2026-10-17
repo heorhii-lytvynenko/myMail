@@ -8,77 +8,32 @@ servers:
   - url: http://localhost:8080
 
 paths:
+  /api/authentication/login:
+    $ref: './user/paths.yaml#/login'
+  /api/authentication/signIn:
+    $ref: './user/paths.yaml#/signIn'
+
   /api/users/me:
-    $ref: './user/paths.yaml#/users_me'
-
+    $ref: './user/paths.yaml#/user'
   /integrations/google/callback:
-    get:
-      tags:
-        - Google Integration
-      summary: Handle Google OAuth callback
-      operationId: googleOAuthCallback
-      parameters:
-        - name: code
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: state
-          in: query
-          required: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Google account connected successfully
-        '400':
-          description: Invalid OAuth callback
-
+    $ref: './integrations/google/paths.yaml#/callback'
   /integrations/google/connect:
-    get:
-      tags:
-        - Google Integration
-      summary: Connect Google account
-      description: Redirects the authenticated user to Google OAuth authorization.
-      operationId: connectGoogle
-      security:
-        - bearerAuth: []
-      responses:
-        '302':
-          description: Redirect to Google OAuth authorization page
-        '401':
-          description: User is not authenticated
-
+    $ref: './integrations/google/paths.yaml#/connect'
   /integrations/google/emails:
-    get:
-      tags:
-        - Google Integration
-      summary: Get Gmail emails
-      description: Retrieves emails from the authenticated user's connected Gmail account.
-      operationId: getGoogleEmails
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Gmail emails retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: './components/schemas.yaml#/EmailMessage'
-        '401':
-          description: User is not authenticated
-        '404':
-          description: Google account is not connected
+    $ref: './integrations/google/paths.yaml#/emails'
 
 components:
   schemas:
     UserResponse:
       $ref: './user/schemas.yaml#/UserResponse'
-
     EmailMessage:
       $ref: './components/schemas.yaml#/EmailMessage'
+    UnauthorizedError:
+      $ref: './components/errors.yaml#/Unauthorized'
+    ForbiddenError:
+      $ref: './components/errors.yaml#/Forbidden'
+    NotFoundError:
+      $ref: './components/errors.yaml#/NotFound'
 
   securitySchemes:
     bearerAuth:
