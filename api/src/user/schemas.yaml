@@ -9,3 +9,62 @@ UserResponse:
     email:
       type: string
       format: email
+
+LoginResponse:
+  type: object
+  required:
+    - accessToken
+    - tokenType
+  properties:
+    accessToken:
+      type: string
+      description: JWT access token
+    tokenType:
+      type: string
+      example: Bearer
+
+SignInResponse:
+  type: object
+  required:
+    - idpId
+    - accessToken
+    - tokenType
+  properties:
+    idpId:
+      type: string
+      description: Auth0 user identifier
+      example: auth0|123
+    accessToken:
+      type: string
+      description: JWT access token
+    tokenType:
+      type: string
+      example: Bearer
+
+LoginRequest:
+  type: object
+  required:
+    - email
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+    password:
+      type: string
+      format: password
+
+SignInRequest:
+  type: object
+  required:
+    - email
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+    password:
+      type: string
+      format: password
+      minLength: 8
+

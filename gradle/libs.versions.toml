@@ -2,58 +2,82 @@
 springBoot = "4.1.0"
 springDependencyManagement = "1.1.7"
 openapiGenerator = "7.23.0"
+
 swagger = "2.2.49"
 springdoc = "3.0.3"
 jacksonDatabindNullable = "0.2.10"
+
 testcontainers = "1.20.4"
-lombok-plugin = "9.5.0"
+
+lombokPlugin = "9.5.0"
+lombokMapstructBinding = "0.2.0"
+mapstruct = "1.6.3"
+lombok = "1.18.42"
+
 auth0 = "3.9.0"
 auth0SpringbootApi = "1.0.0-beta.0"
+
 postgresql = "42.7.8"
-mapstruct = "1.6.3"
+
 resend = "4.22.0"
+
 googleApiClient = "2.8.1"
 googleOauthClient = "1.39.0"
 googleGmail = "v1-rev20250630-2.0.0"
+
 jakartaMail = "2.0.1"
 
+
 [libraries]
+
+# Spring Boot
 spring-boot-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-restclient = { module = "org.springframework.boot:spring-boot-starter-restclient" }
 spring-boot-security = { module = "org.springframework.boot:spring-boot-starter-security" }
 spring-boot-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
 spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test" }
-resend = { module = "com.resend:resend-java", version.ref = "resend" }
 spring-boot-starter-oauth2-resource-server = { module = "org.springframework.boot:spring-boot-starter-oauth2-resource-server" }
-jakarta-mail = { module = "com.sun.mail:jakarta.mail", version.ref = "jakartaMail" }
-google-api-client = { module = "com.google.api-client:google-api-client", version.ref = "googleApiClient" }
-google-oauth-client = { module = "com.google.oauth-client:google-oauth-client", version.ref = "googleOauthClient" }
-google-gmail = { module = "com.google.apis:google-api-services-gmail", version.ref = "googleGmail" }
 
-
+# SpringDoc / OpenAPI
 springdoc = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
-
-auth0-springboot-api = { module = "com.auth0:auth0-springboot-api", version.ref = "auth0SpringbootApi" }
-auth0 = { module = "com.auth0:auth0", version.ref = "auth0" }
-
-postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
-
-lombok = { module = "org.projectlombok:lombok" }
+springdoc-scalar = { module = "org.springdoc:springdoc-openapi-starter-webmvc-scalar", version.ref = "springdoc" }
+springdoc-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "springdoc" }
 
 swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "swagger" }
 swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "swagger" }
 
-springdoc-scalar = { module = "org.springdoc:springdoc-openapi-starter-webmvc-scalar", version.ref = "springdoc" }
-springdoc-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "springdoc" }
-
 jackson-databind-nullable = { module = "org.openapitools:jackson-databind-nullable", version.ref = "jacksonDatabindNullable" }
 
-testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }
-
+# MapStruct
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+
+# Lombok + MapStruct integration
+mapstruct-lombok-binding = { module = "org.projectlombok:lombok-mapstruct-binding", version.ref = "lombokMapstructBinding" }
+lombok-core = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+
+# Auth0
+auth0 = { module = "com.auth0:auth0", version.ref = "auth0" }
+auth0-springboot-api = { module = "com.auth0:auth0-springboot-api", version.ref = "auth0SpringbootApi" }
+
+# Database
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+
+# Email
+resend = { module = "com.resend:resend-java", version.ref = "resend" }
+jakarta-mail = { module = "com.sun.mail:jakarta.mail", version.ref = "jakartaMail" }
+
+# Google
+google-api-client = { module = "com.google.api-client:google-api-client", version.ref = "googleApiClient" }
+google-oauth-client = { module = "com.google.oauth-client:google-oauth-client", version.ref = "googleOauthClient" }
+google-gmail = { module = "com.google.apis:google-api-services-gmail", version.ref = "googleGmail" }
+
+# Testing
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }
+
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependencyManagement = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
 openapi-generator = { id = "org.openapi.generator", version.ref = "openapiGenerator" }
-lombok = { id = "io.freefair.lombok", version.ref = "lombok-plugin" }
+lombok = { id = "io.freefair.lombok", version.ref = "lombokPlugin" }

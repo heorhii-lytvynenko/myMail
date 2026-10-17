@@ -1,12 +1,13 @@
+EmailMessageList:
+  type: array
+  items:
+    $ref: '#/EmailMessage'
+
 EmailMessage:
   type: object
   required:
     - id
-    - threadId
-    - from
     - subject
-    - body
-    - receivedAt
   properties:
     id:
       type: string

@@ -1,4 +1,4 @@
-package com.mymail.email.model;
+package com.mymail.model;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +15,4 @@ public class EmailMessage {
     private String subject;
     private String body;
     private Instant receivedAt;
-
-
 }

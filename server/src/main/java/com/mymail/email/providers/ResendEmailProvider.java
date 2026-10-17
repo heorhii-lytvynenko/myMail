@@ -9,7 +9,7 @@ import com.resend.services.emails.model.CreateEmailOptions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import com.mymail.email.model.EmailMessage;
+import com.mymail.model.EmailMessage;
 
 import java.util.List;
 

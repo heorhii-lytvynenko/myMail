@@ -1,0 +1,58 @@
+callback:
+  get:
+    tags:
+      - Google Integration
+    summary: Handle Google OAuth callback
+    operationId: googleOAuthCallback
+    parameters:
+      - name: code
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: state
+        in: query
+        required: false
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Google account connected successfully
+      '400':
+        description: Invalid OAuth callback
+
+connect:
+  get:
+    tags:
+      - Google Integration
+    summary: Connect Google account
+    description: Redirects the authenticated user to Google OAuth authorization.
+    operationId: connectGoogle
+    security:
+      - bearerAuth: []
+    responses:
+      '302':
+        description: Redirect to Google OAuth authorization page
+      '401':
+        description: User is not authenticated
+
+emails:
+  get:
+    tags:
+      - Google Integration
+    summary: Get Gmail emails
+    description: Retrieves emails from the authenticated user's connected Gmail account.
+    operationId: getGoogleEmails
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Gmail emails retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../../components/schemas.yaml#/EmailMessageList'
+      '401':
+        $ref: '../../components/errors.yaml#/Unauthorized'
+      '404':
+        description: Google account is not connected

@@ -1,6 +1,12 @@
 spring:
   application:
     name: mymail-api
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://${AUTH0_DOMAIN}/
+          audiences: ${AUTH0_API_IDENTIFIER}
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,6 +22,9 @@ spring:
 auth0:
   domain: ${AUTH0_DOMAIN}
   audience: ${AUTH0_API_IDENTIFIER}
+  client-id: ${AUTH0_CLIENT_ID}
+  client-secret: ${AUTH0_CLIENT_SECRET}
+  connection: ${AUTH0_CONNECTION:Username-Password-Authentication}
 
 
 google:

@@ -1,0 +1,38 @@
+Unauthorized:
+  type: object
+  required:
+    - code
+    - message
+  properties:
+    code:
+      type: string
+      example: UNAUTHORIZED
+    message:
+      type: string
+      example: Authentication is required.
+
+Forbidden:
+  type: object
+  required:
+    - code
+    - message
+  properties:
+    code:
+      type: string
+      example: FORBIDDEN
+    message:
+      type: string
+      example: You do not have permission to access this resource.
+
+NotFound:
+  type: object
+  required:
+    - code
+    - message
+  properties:
+    code:
+      type: string
+      example: NOT_FOUND
+    message:
+      type: string
+      example: The requested resource was not found.

@@ -8,6 +8,7 @@ import com.mymail.email.providers.GmailEmailProvider;
 import com.mymail.integration.google.service.GoogleAccountService;
 import com.mymail.integration.google.service.GoogleOAuthService;
 import com.mymail.integration.google.service.OAuthStateService;
+import com.mymail.model.EmailMessage;
 import com.mymail.user.entities.User;
 import com.mymail.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 
-import com.mymail.api.model.EmailMessage;
 import org.springframework.http.ResponseEntity;
 
-import java.time.ZoneOffset;
+
 import java.util.List;
 @RestController
 @RequiredArgsConstructor
@@ -67,17 +67,15 @@ public class GoogleOAuthController implements GoogleIntegrationApi {
     public ResponseEntity<List<EmailMessage>> getGoogleEmails() {
         List<EmailMessage> emails = gmailEmailProvider.getEmails()
                 .stream()
-                .map(email -> new EmailMessage()
+                .map(email -> EmailMessage.builder()
                         .id(email.getId())
                         .threadId(email.getThreadId())
                         .from(email.getFrom())
                         .to(email.getTo())
                         .subject(email.getSubject())
                         .body(email.getBody())
-                        .receivedAt(
-                                email.getReceivedAt()
-                                        .atOffset(ZoneOffset.UTC)
-                        )
+                        .receivedAt(email.getReceivedAt())
+                        .build()
                 )
                 .toList();
 

@@ -27,4 +27,5 @@ public class UserController implements UsersApi {
 
         return ResponseEntity.ok(userMapper.toResponse(user));
     }
+
 }

@@ -16,35 +16,46 @@ springBoot {
 
 dependencies {
     implementation(project(":api"))
+    implementation(project(":domain"))
 
+    // Lombok
+    compileOnly(libs.lombok.core)
+    annotationProcessor(libs.lombok.core)
+
+    // MapStruct
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
+    annotationProcessor(libs.mapstruct.lombok.binding)
 
-    implementation(libs.resend)
+    // Spring
+    implementation(libs.spring.boot.web)
+    implementation(libs.spring.boot.restclient)
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation(libs.spring.boot.security)
+    implementation(libs.spring.boot.data.jpa)
+    implementation(libs.spring.boot.starter.oauth2.resource.server)
 
+    // OpenAPI
+    implementation(libs.springdoc)
+
+
+    // Google
     implementation(libs.google.api.client)
     implementation(libs.google.oauth.client)
     implementation(libs.google.gmail)
 
-    implementation(libs.auth0.springboot.api)
-    implementation(libs.spring.boot.web)
-    implementation(libs.spring.boot.security)
-    implementation(libs.spring.boot.data.jpa)
-    implementation(libs.springdoc)
-
-    implementation(libs.mapstruct)
-    annotationProcessor(libs.mapstruct.processor)
-    implementation(libs.spring.boot.starter.oauth2.resource.server)
+    // Email
+    implementation(libs.resend)
     implementation(libs.jakarta.mail)
 
-    implementation(libs.resend)
-
+    // Database
     runtimeOnly(libs.postgresql)
 
-    compileOnly(libs.lombok)
-    annotationProcessor(libs.lombok)
-
+    // Testing
     testImplementation(libs.spring.boot.test)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testCompileOnly(libs.lombok.core)
+    testAnnotationProcessor(libs.lombok.core)
 }
 
 val loadDotEnv = {
@@ -65,8 +76,10 @@ val loadDotEnv = {
                 val key = line.substring(0, index).trim()
                 var value = line.substring(index + 1).trim()
 
-                if ((value.startsWith("\"") && value.endsWith("\"")) ||
-                    (value.startsWith("'") && value.endsWith("'"))) {
+                if (
+                    (value.startsWith("\"") && value.endsWith("\"")) ||
+                    (value.startsWith("'") && value.endsWith("'"))
+                ) {
                     value = value.substring(1, value.length - 1)
                 }
 
@@ -77,4 +90,7 @@ val loadDotEnv = {
 
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     environment(loadDotEnv())
+}
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
