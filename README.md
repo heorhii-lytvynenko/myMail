@@ -119,6 +119,17 @@ On Windows:
 
 The Gradle `bootRun` task loads variables from the root `.env` file.
 
+### Run the backend with Docker
+
+With PostgreSQL running, build and start the backend container:
+
+```bash
+docker build -t mymail .
+docker run --rm -p 8080:8080 --env-file .env -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/mymail mymail
+```
+
+On Linux, add `--add-host=host.docker.internal:host-gateway` to the `docker run` command. If your database name differs, replace `mymail` in the connection URL. Environment variables are supplied at runtime; `.env` files are excluded from the image build.
+
 ## Build and test
 
 ```bash
