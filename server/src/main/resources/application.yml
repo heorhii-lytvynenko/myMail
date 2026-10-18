@@ -15,7 +15,7 @@ spring:
     api-key: ${RESEND_API_KEY}
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/mymail
+    url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
