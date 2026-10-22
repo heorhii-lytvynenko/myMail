@@ -19,6 +19,15 @@ import java.time.Instant;
 @Table(name = "google_oauth_states")
 public class GoogleOAuthState extends Immutable {
 
+    @Column(name = "redirect_uri", nullable = false)
+    private String redirectUri;
+    @Column(name = "code_challenge", nullable = false)
+    private String codeChallenge;
+    @Column(name = "code_challenge_method", nullable = false)
+    private String codeChallengeMethod;
+    @Column(name = "transaction_status", nullable = false)
+    private String transactionStatus = "pending";
+
     @Column(name = "state", nullable = false, unique = true)
     private String state;
 

@@ -1,5 +1,3 @@
-import javax.validation.constraints.Email
-
 plugins {
     java
     alias(libs.plugins.openapi.generator)
@@ -80,4 +78,8 @@ tasks.named("openApiGenerate") {
 
 tasks.named("compileJava") {
     dependsOn(tasks.named("openApiGenerate"))
+}
+
+openApiValidate {
+    inputSpec.set("$projectDir/src/api.yaml")
 }
