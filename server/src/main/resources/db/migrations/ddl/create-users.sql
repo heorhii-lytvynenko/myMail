@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_by VARCHAR,
     deleted_at TIMESTAMPTZ,
     deleted_by VARCHAR
-)
+);
 
 CREATE UNIQUE INDEX IF NOT EXISTS users_email_unique
 ON users(LOWER(email))

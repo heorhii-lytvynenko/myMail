@@ -61,7 +61,7 @@ The backend is organized by business domain, including authentication, users, em
 ### Prerequisites
 
 - JDK 21
-- Docker and Docker Compose
+- Docker and Docker Compose (also required for PostgreSQL integration tests)
 - Auth0 application and API
 - Google Cloud OAuth credentials with Gmail API access
 - Resend API key
@@ -93,9 +93,11 @@ cp .env.example .env
 | `RESEND_API_KEY` | Resend API key |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
-| `REDIRECT_URI` | Google OAuth callback URL |
+| `GOOGLE_INTEGRATION_ENABLED` | Defaults false; enable after verification |
+| `GOOGLE_ALLOWED_REDIRECT_URIS` | Exact frontend callback allowlist |
+| `GOOGLE_TOKEN_ENCRYPTION_KEY` | Backend-only 32-byte base64url encryption key |
 
-The database credentials used by the application must match the credentials configured for the PostgreSQL container.
+The database credentials used by the application must match the credentials configured for the PostgreSQL container. Follow [authentication setup](docs/authentication.md) and the [security rollout guide](docs/security-contract.md) before enabling Google or frontend backend-logout flags. Liquibase manages the schema and startup encrypts legacy Google credentials.
 
 ### 3. Start PostgreSQL
 

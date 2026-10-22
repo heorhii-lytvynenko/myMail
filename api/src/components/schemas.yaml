@@ -1,7 +1,7 @@
 EmailMessageList:
   type: array
   items:
-    $ref: '#/EmailMessage'
+    $ref: './schemas.yaml#/EmailMessage'
 
 EmailMessage:
   type: object
@@ -24,3 +24,11 @@ EmailMessage:
     receivedAt:
       type: string
       format: date-time
+ApiError:
+  type: object
+  required: [code, message]
+  properties:
+    code:
+      type: string
+    message:
+      type: string

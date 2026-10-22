@@ -14,11 +14,16 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    public void requireEmailAvailable(String email) {
+        if (userRepository.existsByEmailIgnoreCase(email))
+            throw new com.mymail.common.ApiException(org.springframework.http.HttpStatus.CONFLICT, "ACCOUNT_EXISTS");
+    }
+
     public User saveRegisteredUser(String idpId, String email) {
         return userRepository.findByIdpId(idpId).orElseGet(() -> {
             User user = new User();
             user.setIdpId(idpId);
-            user.setEmail(email);
+            user.setEmail(com.mymail.authentication.service.IdentityPolicy.email(email));
             return userRepository.save(user);
         });
     }
@@ -30,8 +35,12 @@ public class UserService {
         }
         String idpId = authentication.getName();
 
-        return userRepository.findByIdpId(idpId)
-                .orElseGet(() -> createUser(authentication));
+        User user = userRepository.findByIdpId(idpId).orElseGet(() -> createUser(authentication));
+        if (user.getIdpId() == null || user.getIdpId().isBlank())
+            throw new org.springframework.security.access.AccessDeniedException("Invalid profile");
+        try { com.mymail.authentication.service.IdentityPolicy.email(user.getEmail()); }
+        catch (RuntimeException ex) { throw new org.springframework.security.access.AccessDeniedException("Invalid profile"); }
+        return user;
     }
 
     private User createUser(Authentication authentication) {
@@ -40,7 +49,7 @@ public class UserService {
 
         User user = new User();
         user.setIdpId(idpId);
-        user.setEmail(email);
+        user.setEmail(com.mymail.authentication.service.IdentityPolicy.email(email));
 
         return userRepository.save(user);
     }
@@ -55,10 +64,11 @@ public class UserService {
 
         Object email = auth0Authentication.getToken().getClaim("https://mymail.com/email");
 
-        if (email == null || email.toString().isBlank()) {
-            throw new IllegalStateException("Email claim is missing from Auth0 token");
+        if (!(email instanceof String) || email.toString().isBlank()) {
+            throw new org.springframework.security.access.AccessDeniedException("Required email claim missing");
         }
 
-        return email.toString();
+        try { return com.mymail.authentication.service.IdentityPolicy.email((String) email); }
+        catch (RuntimeException ex) { throw new org.springframework.security.access.AccessDeniedException("Invalid email claim"); }
     }
 }

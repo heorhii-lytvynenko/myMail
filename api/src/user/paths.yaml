@@ -1,28 +1,33 @@
-
 user:
   get:
-    tags:
-      - Users
-    summary: Get current authenticated user
+    tags: [Users]
     operationId: getCurrentUser
+    summary: Get exactly idpId and email for the verified application user
     security:
       - bearerAuth: []
     responses:
       '200':
-        description: Current authenticated user
+        description: Current profile; Cache-Control no-store.
+        headers:
+          Cache-Control:
+            schema:
+              type: string
+              enum: [no-store]
         content:
           application/json:
             schema:
               $ref: './schemas.yaml#/UserResponse'
       '401':
         $ref: '../components/errors.yaml#/Unauthorized'
-
+      '403':
+        $ref: '../components/errors.yaml#/Forbidden'
+      '503':
+        $ref: '../components/errors.yaml#/ServiceFailure'
 login:
   post:
-    tags:
-      - Authentication
-    summary: Authenticate user
+    tags: [Authentication]
     operationId: login
+    summary: Authenticate using the existing Auth0 password realm
     security: []
     requestBody:
       required: true
@@ -32,20 +37,31 @@ login:
             $ref: './schemas.yaml#/LoginRequest'
     responses:
       '200':
-        description: Login successful
+        description: Verified application JWT with actual remaining lifetime; Cache-Control no-store.
+        headers:
+          Cache-Control:
+            schema:
+              type: string
+              enum: [no-store]
         content:
           application/json:
             schema:
               $ref: './schemas.yaml#/LoginResponse'
+      '400':
+        $ref: '../components/errors.yaml#/BadRequest'
       '401':
         $ref: '../components/errors.yaml#/Unauthorized'
-
+      '429':
+        $ref: '../components/errors.yaml#/TooManyRequests'
+      '502':
+        $ref: '../components/errors.yaml#/ServiceFailure'
+      '503':
+        $ref: '../components/errors.yaml#/ServiceFailure'
 signIn:
   post:
-    tags:
-      - Authentication
+    tags: [Authentication]
     operationId: signIn
-    summary: Register new user
+    summary: Register using Auth0's configured database password policy
     security: []
     requestBody:
       required: true
@@ -55,10 +71,44 @@ signIn:
             $ref: './schemas.yaml#/SignInRequest'
     responses:
       '201':
-        description: User created successfully
+        description: Created profile and verified application JWT; Cache-Control no-store.
+        headers:
+          Cache-Control:
+            schema:
+              type: string
+              enum: [no-store]
         content:
           application/json:
             schema:
               $ref: './schemas.yaml#/SignInResponse'
+      '400':
+        $ref: '../components/errors.yaml#/BadRequest'
+      '401':
+        $ref: '../components/errors.yaml#/Unauthorized'
       '409':
-        description: User already exists
+        $ref: '../components/errors.yaml#/Conflict'
+      '429':
+        $ref: '../components/errors.yaml#/TooManyRequests'
+      '502':
+        $ref: '../components/errors.yaml#/ServiceFailure'
+      '503':
+        $ref: '../components/errors.yaml#/ServiceFailure'
+logout:
+  post:
+    tags: [Authentication]
+    operationId: logout
+    summary: Invalidate this exact application access token until its expiry
+    security:
+      - bearerAuth: []
+    responses:
+      '204':
+        description: Invalidated; repeat logout is safe. Gmail stays connected. Cache-Control no-store.
+        headers:
+          Cache-Control:
+            schema:
+              type: string
+              enum: [no-store]
+      '401':
+        $ref: '../components/errors.yaml#/Unauthorized'
+      '503':
+        $ref: '../components/errors.yaml#/ServiceFailure'

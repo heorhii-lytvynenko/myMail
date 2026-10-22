@@ -12,7 +12,7 @@ import static org.mockito.Mockito.*;
 class AuthenticationServiceTest {
     private final Auth0Client auth0 = mock(Auth0Client.class);
     private final UserService users = mock(UserService.class);
-    private final AuthenticationService service = new AuthenticationService(auth0, users);
+    private final AuthenticationService service = new AuthenticationService(auth0, users, mock(AuthenticationRateLimiter.class), mock(TokenRevocations.class));
 
     @Test
     void registersPersistsIdentityAndReturnsTokenInOrder() {
@@ -36,7 +36,8 @@ class AuthenticationServiceTest {
         when(auth0.register(anyString(), anyString())).thenThrow(new IllegalStateException("rejected"));
         assertThrows(IllegalStateException.class,
                 () -> service.register(new SignInRequest().email("user@example.com").password("password123")));
-        verifyNoInteractions(users);
+        verify(users).requireEmailAvailable("user@example.com");
+        verify(users, never()).saveRegisteredUser(anyString(), anyString());
         verify(auth0, never()).login(anyString(), anyString());
     }
 

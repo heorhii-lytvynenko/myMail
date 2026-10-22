@@ -5,16 +5,27 @@ info:
   version: 0.1.0
 
 servers:
+  - url: https://mymail.fly.dev
   - url: http://localhost:8080
 
 paths:
   /api/authentication/login:
     $ref: './user/paths.yaml#/login'
+  /api/authentication/logout:
+    $ref: './user/paths.yaml#/logout'
   /api/authentication/signIn:
     $ref: './user/paths.yaml#/signIn'
 
   /api/users/me:
     $ref: './user/paths.yaml#/user'
+  /integrations/google/authorize:
+    $ref: './integrations/google/paths.yaml#/authorize'
+  /integrations/google/complete:
+    $ref: './integrations/google/paths.yaml#/complete'
+  /integrations/google/status:
+    $ref: './integrations/google/paths.yaml#/status'
+  /integrations/google:
+    $ref: './integrations/google/paths.yaml#/disconnect'
   /integrations/google/callback:
     $ref: './integrations/google/paths.yaml#/callback'
   /integrations/google/connect:
@@ -24,17 +35,12 @@ paths:
 
 components:
   schemas:
+    ApiError:
+      $ref: './components/schemas.yaml#/ApiError'
     UserResponse:
       $ref: './user/schemas.yaml#/UserResponse'
     EmailMessage:
       $ref: './components/schemas.yaml#/EmailMessage'
-    UnauthorizedError:
-      $ref: './components/errors.yaml#/Unauthorized'
-    ForbiddenError:
-      $ref: './components/errors.yaml#/Forbidden'
-    NotFoundError:
-      $ref: './components/errors.yaml#/NotFound'
-
   securitySchemes:
     bearerAuth:
       type: http

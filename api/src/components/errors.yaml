@@ -1,38 +1,72 @@
+BadRequest:
+  description: Validation rejected or invalid/expired/replayed OAuth transaction.
+  headers:
+    Cache-Control:
+      schema:
+        type: string
+        enum: [no-store]
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/ApiError'
 Unauthorized:
-  type: object
-  required:
-    - code
-    - message
-  properties:
-    code:
-      type: string
-      example: UNAUTHORIZED
-    message:
-      type: string
-      example: Authentication is required.
-
+  description: Missing, invalid, expired, or revoked application session.
+  headers:
+    Cache-Control:
+      schema:
+        type: string
+        enum: [no-store]
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/ApiError'
 Forbidden:
-  type: object
-  required:
-    - code
-    - message
-  properties:
-    code:
-      type: string
-      example: FORBIDDEN
-    message:
-      type: string
-      example: You do not have permission to access this resource.
-
+  description: Authenticated identity denied access or transaction ownership mismatch.
+  headers:
+    Cache-Control:
+      schema:
+        type: string
+        enum: [no-store]
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/ApiError'
 NotFound:
-  type: object
-  required:
-    - code
-    - message
-  properties:
-    code:
-      type: string
-      example: NOT_FOUND
-    message:
-      type: string
-      example: The requested resource was not found.
+  description: Resource not found.
+Conflict:
+  description: Duplicate account or pending disconnect.
+  headers:
+    Cache-Control:
+      schema:
+        type: string
+        enum: [no-store]
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/ApiError'
+TooManyRequests:
+  description: Rate limit exceeded.
+  headers:
+    Retry-After:
+      schema:
+        type: integer
+        minimum: 1
+    Cache-Control:
+      schema:
+        type: string
+        enum: [no-store]
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/ApiError'
+ServiceFailure:
+  description: Upstream or backend service unavailable; no provider details exposed.
+  headers:
+    Cache-Control:
+      schema:
+        type: string
+        enum: [no-store]
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/ApiError'

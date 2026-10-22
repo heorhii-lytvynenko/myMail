@@ -38,8 +38,7 @@ public class GmailService {
 
         } catch (IOException | GeneralSecurityException e) {
             throw new IllegalStateException(
-                    "Failed to retrieve Google account profile",
-                    e
+                    "Failed to retrieve Google account profile"
             );
         }
     }
@@ -64,8 +63,7 @@ public class GmailService {
 
         } catch (IOException | GeneralSecurityException e) {
             throw new IllegalStateException(
-                    "Failed to retrieve Gmail emails",
-                    e
+                    "Failed to retrieve Gmail emails"
             );
         }
     }
@@ -82,8 +80,7 @@ public class GmailService {
 
         } catch (IOException e) {
             throw new IllegalStateException(
-                    "Failed to retrieve Gmail message",
-                    e
+                    "Failed to retrieve Gmail message"
             );
         }
     }
@@ -227,8 +224,7 @@ public class GmailService {
 
         } catch (MessagingException | IOException | GeneralSecurityException e) {
             throw new IllegalStateException(
-                    "Failed to send Gmail message",
-                    e
+                    "Failed to send Gmail message"
             );
         }
     }

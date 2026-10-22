@@ -24,14 +24,7 @@ public class GmailEmailProvider implements EmailProvider {
             String subject,
             String html
     ) {
-        GoogleAccount account = getCurrentGoogleAccount();
-
-        gmailService.send(
-                account.getAccessToken(),
-                to,
-                subject,
-                html
-        );
+        throw new com.mymail.common.ApiException(org.springframework.http.HttpStatus.FORBIDDEN, "GMAIL_READ_ONLY");
     }
 
     @Override

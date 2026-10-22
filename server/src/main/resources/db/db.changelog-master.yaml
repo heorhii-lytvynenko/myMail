@@ -4,3 +4,10 @@ databaseChangeLog:
       relativeToChangelogFile: true
   - include:
       file: migrations/ddl/create-google-accounts.sql
+      relativeToChangelogFile: true
+  - include:
+      file: migrations/ddl/create-google-oauth-states.sql
+      relativeToChangelogFile: true
+  - include:
+      file: migrations/ddl/security-contract.sql
+      relativeToChangelogFile: true

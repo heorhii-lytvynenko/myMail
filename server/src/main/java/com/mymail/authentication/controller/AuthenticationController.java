@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -43,6 +42,14 @@ public class AuthenticationController implements AuthenticationApi {
         ));
     }
 
+
+    @Override
+    public ResponseEntity<Void> logout() {
+        var authentication = (org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken)
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        authenticationService.logout(authentication.getToken());
+        return ResponseEntity.noContent().build();
+    }
 
     @Override
     public ResponseEntity<LoginResponse> login(

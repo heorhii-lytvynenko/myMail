@@ -33,6 +33,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation(libs.spring.boot.security)
     implementation(libs.spring.boot.data.jpa)
+    implementation("org.springframework.boot:spring-boot-starter-liquibase")
     implementation(libs.spring.boot.starter.oauth2.resource.server)
 
     // OpenAPI
@@ -53,6 +54,10 @@ dependencies {
 
     // Testing
     testImplementation(libs.spring.boot.test)
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.testcontainers:postgresql:1.20.4")
+    testImplementation("org.testcontainers:junit-jupiter:1.20.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testCompileOnly(libs.lombok.core)
     testAnnotationProcessor(libs.lombok.core)

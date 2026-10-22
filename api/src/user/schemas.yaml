@@ -6,9 +6,12 @@ UserResponse:
   properties:
     idpId:
       type: string
+      minLength: 1
     email:
       type: string
       format: email
+      minLength: 3
+      maxLength: 254
 
 LoginResponse:
   type: object
@@ -18,10 +21,15 @@ LoginResponse:
   properties:
     accessToken:
       type: string
-      description: JWT access token
+      description: Verified application JWT
     tokenType:
       type: string
-      example: Bearer
+      pattern: '^Bearer$'
+    expiresIn:
+      type: integer
+      format: int64
+      minimum: 1
+      description: Actual remaining lifetime bounded by verified JWT exp and Auth0 expires_in.
 
 SignInResponse:
   type: object
@@ -32,14 +40,20 @@ SignInResponse:
   properties:
     idpId:
       type: string
+      minLength: 1
       description: Auth0 user identifier
       example: auth0|123
     accessToken:
       type: string
-      description: JWT access token
+      description: Verified application JWT
     tokenType:
       type: string
-      example: Bearer
+      pattern: '^Bearer$'
+    expiresIn:
+      type: integer
+      format: int64
+      minimum: 1
+      description: Actual remaining lifetime bounded by verified JWT exp and Auth0 expires_in.
 
 LoginRequest:
   type: object
@@ -50,9 +64,13 @@ LoginRequest:
     email:
       type: string
       format: email
+      minLength: 3
+      maxLength: 254
     password:
       type: string
       format: password
+      writeOnly: true
+      minLength: 1
 
 SignInRequest:
   type: object
@@ -63,8 +81,11 @@ SignInRequest:
     email:
       type: string
       format: email
+      minLength: 3
+      maxLength: 254
     password:
       type: string
       format: password
+      writeOnly: true
       minLength: 8
 

@@ -14,6 +14,8 @@ class Auth0ClientConfigurationTest {
         new ApplicationContextRunner()
                 .withConfiguration(AutoConfigurations.of(RestClientAutoConfiguration.class))
                 .withUserConfiguration(Auth0Client.class)
+                .withBean(org.springframework.security.oauth2.jwt.JwtDecoder.class,
+                        () -> org.mockito.Mockito.mock(org.springframework.security.oauth2.jwt.JwtDecoder.class))
                 .withPropertyValues(
                         "auth0.domain=tenant.auth0.com",
                         "auth0.client-id=test-client",

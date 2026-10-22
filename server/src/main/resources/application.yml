@@ -7,12 +7,12 @@ spring:
         jwt:
           issuer-uri: https://${AUTH0_DOMAIN}/
           audiences: ${AUTH0_API_IDENTIFIER}
+  liquibase:
+    change-log: classpath:db/db.changelog-master.yaml
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     open-in-view: false
-  resend:
-    api-key: ${RESEND_API_KEY}
 
   datasource:
     url: ${DB_URL}
@@ -29,6 +29,26 @@ auth0:
 
 google:
   oauth:
-    client-id: ${GOOGLE_CLIENT_ID}
-    client-secret: ${GOOGLE_CLIENT_SECRET}
-    redirect-uri: ${REDIRECT_URI}
+    client-id: ${GOOGLE_CLIENT_ID:}
+    client-secret: ${GOOGLE_CLIENT_SECRET:}
+    enabled: ${GOOGLE_INTEGRATION_ENABLED:false}
+    allowed-redirect-uris: ${GOOGLE_ALLOWED_REDIRECT_URIS:https://my-mail-front.vercel.app/api/integrations/google/callback}
+    token-encryption-key: ${GOOGLE_TOKEN_ENCRYPTION_KEY:}
+server:
+  forward-headers-strategy: none
+  tomcat:
+    accesslog:
+      enabled: false
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+logging:
+  level:
+    org.springframework.web: INFO
+    org.springframework.web.client: INFO
+    org.hibernate.orm.jdbc.bind: OFF
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: OFF
+
+resend:
+  api-key: ${RESEND_API_KEY}
