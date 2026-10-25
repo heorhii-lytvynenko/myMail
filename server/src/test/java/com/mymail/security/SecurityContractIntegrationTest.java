@@ -79,7 +79,7 @@ class SecurityContractIntegrationTest {
     String bob;
 
     @BeforeEach void setup() throws Exception {
-        jdbc.execute("truncate table google_oauth_states, google_accounts, users, revoked_access_tokens, authentication_rate_limits cascade");
+        jdbc.execute("truncate table emails, google_emails, google_oauth_states, google_accounts, users, revoked_access_tokens, authentication_rate_limits cascade");
         reset(google, auth0);
         alice = token("alice", "alice@example.com", Instant.now().plusSeconds(3600), "https://tenant.invalid/", "mymail-test", KEY);
         bob = token("bob", "bob@example.com", Instant.now().plusSeconds(3600), "https://tenant.invalid/", "mymail-test", KEY);
@@ -379,7 +379,7 @@ class SecurityContractIntegrationTest {
         new com.mymail.authentication.service.TokenRevocations(jdbc).cleanup();
         assertEquals(0, jdbc.queryForObject("select count(*) from google_oauth_states", Integer.class));
         assertEquals(0, jdbc.queryForObject("select count(*) from revoked_access_tokens", Integer.class));
-        assertEquals(4, jdbc.queryForObject("select count(*) from databasechangelog", Integer.class));
+        assertEquals(8, jdbc.queryForObject("select count(*) from databasechangelog", Integer.class));
     }
 
     @Test void missingRoutesAndUnimplementedGoogleEmailApiReturnNotFoundDto() throws Exception {
@@ -389,5 +389,22 @@ class SecurityContractIntegrationTest {
             assertEquals("NOT_FOUND", json.readTree(result.getResponse().getContentAsByteArray()).get("error").asText());
         }
         verifyNoInteractions(google);
+    }
+
+    @Test void disconnectRemovesCachedActiveAndSoftDeletedMessageRows() throws Exception {
+        connect();
+        UUID accountId = jdbc.queryForObject("select id from google_accounts", UUID.class);
+        for (boolean deleted : List.of(false, true)) {
+            UUID id = UUID.randomUUID();
+            jdbc.update("insert into emails(id, thread_id, created_at, created_by, version) values (?, ?, current_timestamp, 'test', 0)",
+                    id, "cached-thread");
+            jdbc.update("insert into google_emails(id, google_message_id, google_thread_id, google_account_id) values (?, ?, ?, ?)",
+                    id, "cached-message-" + deleted, "cached-thread", accountId);
+            if (deleted) jdbc.update("update emails set deleted_at = current_timestamp, deleted_by = 'test' where id = ?", id);
+        }
+        status(204, perform(delete("/integrations/google"), alice));
+        assertEquals(0, jdbc.queryForObject("select count(*) from google_emails", Integer.class));
+        assertEquals(0, jdbc.queryForObject("select count(*) from emails", Integer.class));
+        status(204, perform(delete("/integrations/google"), alice));
     }
 }
