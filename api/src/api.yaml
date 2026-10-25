@@ -31,16 +31,18 @@ paths:
   /integrations/google/connect:
     $ref: './integrations/google/paths.yaml#/connect'
   /integrations/google/emails:
-    $ref: './integrations/google/paths.yaml#/emails'
+    $ref: './integrations/google/email/paths.yaml#/email'
 
 components:
   schemas:
-    ApiError:
-      $ref: './components/schemas.yaml#/ApiError'
+    ErrorDto:
+      $ref: './components/schemas.yaml#/ErrorDto'
     UserResponse:
       $ref: './user/schemas.yaml#/UserResponse'
-    EmailMessage:
-      $ref: './components/schemas.yaml#/EmailMessage'
+    EmailResponse:
+      $ref: './components/schemas.yaml#/EmailResponse'
+    PageResponse:
+      $ref: './components/schemas.yaml#/PageResponse'
   securitySchemes:
     bearerAuth:
       type: http

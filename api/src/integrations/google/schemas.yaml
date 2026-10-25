@@ -13,6 +13,7 @@ GoogleAuthorizeRequest:
     codeChallengeMethod:
       type: string
       enum: [S256]
+
 GoogleAuthorizationResponse:
   type: object
   required: [authorizationUrl, state, expiresIn]
@@ -27,6 +28,7 @@ GoogleAuthorizationResponse:
       type: integer
       minimum: 1
       maximum: 600
+
 GoogleCompleteRequest:
   type: object
   additionalProperties: false
@@ -65,3 +67,5 @@ GoogleConnectionResponse:
       items:
         type: string
         pattern: '^https://www[.]googleapis[.]com/auth/gmail[.]readonly$'
+
+

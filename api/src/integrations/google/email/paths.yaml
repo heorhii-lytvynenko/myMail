@@ -1,0 +1,51 @@
+email:
+  get:
+    tags: [Google Integration]
+    summary: Get Google emails
+    description: Retrieves emails
+    operationId: getGmailEmails
+    security:
+      - bearerAuth: []
+    x-spring-paginated: true
+    parameters:
+      - $ref: '../../../components/parameters.yaml#/Page'
+      - $ref: '../../../components/parameters.yaml#/Size'
+      - name: sort
+        in: query
+        required: false
+        description: Optional sorting in Spring Pageable format
+        schema:
+          type: array
+          items:
+            type: string
+        style: form
+        explode: true
+    responses:
+      '200':
+        description: Emails retrieved successfully
+        headers:
+          Cache-Control:
+            schema:
+              type: string
+              enum: [ no-store ]
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/GetGoogleEmailsResponse'
+      '401':
+        $ref: '../../../components/errors.yaml#/Unauthorized'
+      '400':
+        $ref: '../../../components/errors.yaml#/BadRequest'
+      '403':
+        $ref: '../../../components/errors.yaml#/Forbidden'
+      '409':
+        $ref: '../../../components/errors.yaml#/Conflict'
+      '429':
+        $ref: '../../../components/errors.yaml#/TooManyRequests'
+      '500':
+        $ref: '../../../components/errors.yaml#/InternalServerError'
+      '502':
+        $ref: '../../../components/errors.yaml#/ServiceFailure'
+      '503':
+        $ref: '../../../components/errors.yaml#/ServiceFailure'
+

@@ -1,9 +1,86 @@
-EmailMessageList:
-  type: array
-  items:
-    $ref: './schemas.yaml#/EmailMessage'
+PostResponse:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      type: string
+      format: uuid
+      example: "7f9c8d13-5b1d-4a9d-9a47-0f3d8b6c9e12"
 
-EmailMessage:
+ErrorDto:
+  type: object
+  required:
+    - error
+    - status
+    - timestamp
+    - path
+  properties:
+    error:
+      type: string
+      example: VALIDATION_FAILED
+    status:
+      type: integer
+      format: int32
+      example: 400
+    timestamp:
+      type: string
+      format: date-time
+      example: "2030-01-01T10:00:00Z"
+    path:
+      type: string
+      example: /api/v1/consumers
+    message:
+      type: string
+      example: page must be greater than or equal to 0
+
+BaseListItemResponse:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: Unique resource identifier.
+      example: "7f9c8d13-5b1d-4a9d-9a47-0f3d8b6c9e12"
+
+PageResponse:
+  type: object
+  required:
+    - size
+    - number
+    - totalElements
+    - totalPages
+  properties:
+    size:
+      type: integer
+      format: int32
+      minimum: 1
+      description: Number of elements requested in the page.
+      example: 20
+    number:
+      type: integer
+      format: int32
+      minimum: 0
+      description: Zero-based page index.
+      example: 0
+    totalElements:
+      type: integer
+      format: int64
+      minimum: 0
+      description: Total number of elements across all pages.
+      example: 42
+    totalPages:
+      type: integer
+      format: int32
+      minimum: 0
+      description: Total number of pages.
+      example: 3
+
+EmailResponse:
+  allOf:
+    - $ref: './schemas.yaml#/BaseListItemResponse'
   type: object
   required:
     - id
@@ -24,11 +101,3 @@ EmailMessage:
     receivedAt:
       type: string
       format: date-time
-ApiError:
-  type: object
-  required: [code, message]
-  properties:
-    code:
-      type: string
-    message:
-      type: string
