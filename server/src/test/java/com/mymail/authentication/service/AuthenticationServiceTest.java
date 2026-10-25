@@ -3,8 +3,10 @@ package com.mymail.authentication.service;
 import com.mymail.api.model.LoginRequest;
 import com.mymail.api.model.LoginResponse;
 import com.mymail.api.model.SignInRequest;
+import com.mymail.authentication.mappers.AuthenticationMapper;
 import com.mymail.user.service.UserService;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -12,7 +14,7 @@ import static org.mockito.Mockito.*;
 class AuthenticationServiceTest {
     private final Auth0Client auth0 = mock(Auth0Client.class);
     private final UserService users = mock(UserService.class);
-    private final AuthenticationService service = new AuthenticationService(auth0, users, mock(AuthenticationRateLimiter.class), mock(TokenRevocations.class));
+    private final AuthenticationService service = new AuthenticationService(auth0, Mappers.getMapper(AuthenticationMapper.class), users, mock(AuthenticationRateLimiter.class), mock(TokenRevocations.class));
 
     @Test
     void registersPersistsIdentityAndReturnsTokenInOrder() {

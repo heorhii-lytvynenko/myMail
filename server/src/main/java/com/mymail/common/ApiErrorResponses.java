@@ -1,8 +1,10 @@
 package com.mymail.common;
 
 import com.mymail.api.model.ErrorDto;
+import com.mymail.common.mappers.ApiErrorMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -11,15 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-
 /** One error contract for MVC controllers and security failures before controller dispatch. */
 @Component
 @RequiredArgsConstructor
 public class ApiErrorResponses {
     private final JsonMapper json;
+    private final ApiErrorMapper mapper;
 
     public ResponseEntity<ErrorDto> response(HttpServletRequest request, int status, String error) {
         return ResponseEntity.status(status).headers(headers(status)).body(body(request, status, error));
@@ -36,10 +35,9 @@ public class ApiErrorResponses {
         json.writeValue(response.getOutputStream(), body(request, status, error));
     }
 
-    private static ErrorDto body(HttpServletRequest request, int status, String error) {
+    private ErrorDto body(HttpServletRequest request, int status, String error) {
         // getRequestURI excludes query parameters, which can contain OAuth codes/state.
-        return new ErrorDto(error, status, OffsetDateTime.now(ZoneOffset.UTC), request.getRequestURI())
-                .message("Request could not be completed.");
+        return mapper.toResponse(request.getRequestURI(), status, error);
     }
 
     private static HttpHeaders headers(int status) {

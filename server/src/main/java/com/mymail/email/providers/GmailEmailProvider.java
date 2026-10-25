@@ -1,15 +1,17 @@
 package com.mymail.email.providers;
 
-import com.mymail.model.EmailMessage;
+import com.google.auth.oauth2.AccessToken;
+import com.mymail.common.ApiException;
+import com.mymail.email.entities.Email;
+import com.mymail.email.service.GmailService;
 import com.mymail.integration.google.entities.GoogleAccount;
-import com.mymail.integration.google.service.GmailService;
 import com.mymail.integration.google.service.GoogleAccountService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -24,16 +26,15 @@ public class GmailEmailProvider implements EmailProvider {
             String subject,
             String html
     ) {
-        throw new com.mymail.common.ApiException(org.springframework.http.HttpStatus.FORBIDDEN, "GMAIL_READ_ONLY");
+        throw new ApiException(HttpStatus.FORBIDDEN, "GMAIL_READ_ONLY");
     }
 
     @Override
-    public List<EmailMessage> getEmails() {
+    public List<Email> getEmails() {
         GoogleAccount account = getCurrentGoogleAccount();
+        AccessToken accessToken = account.getAccessToken();
 
-        return gmailService.getEmails(
-                account.getAccessToken()
-        );
+        return gmailService.getEmails(accessToken);
     }
 
     private GoogleAccount getCurrentGoogleAccount() {

@@ -1,9 +1,13 @@
 package com.mymail.common;
 
 import com.mymail.api.model.SignInRequest;
+import com.mymail.common.mappers.ApiErrorMapper;
 import jakarta.validation.Valid;
+import java.time.OffsetDateTime;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.http.HttpStatus;
@@ -16,15 +20,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.time.OffsetDateTime;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 class ApiErrorsTest {
     private final JsonMapper json = new JsonMapper();
-    private final ApiErrorResponses errors = new ApiErrorResponses(json);
+    private final ApiErrorResponses errors = new ApiErrorResponses(json, Mappers.getMapper(ApiErrorMapper.class));
     private MockMvc mvc;
 
     @BeforeEach

@@ -7,13 +7,13 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.Instant;
 
 @Entity
 @Table(name = "emails", indexes = @Index(name = "idx_emails_received_at", columnList = "received_at, id"))
@@ -52,4 +52,8 @@ public class Email extends SoftDeletable {
 
     @Column(name = "received_at")
     private Instant receivedAt;
+
+    // Fetched on demand; the metadata cache does not persist full message bodies.
+    @Transient
+    private String body;
 }

@@ -3,12 +3,12 @@ package com.mymail.authentication.controller;
 import com.mymail.api.model.LoginRequest;
 import com.mymail.api.model.SignInRequest;
 import com.mymail.authentication.service.IdentityPolicy;
+import java.lang.reflect.Type;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAdapter;
-import java.lang.reflect.Type;
 
 @ControllerAdvice
 public class CredentialBodyAdvice extends RequestBodyAdviceAdapter {

@@ -1,11 +1,16 @@
 package com.mymail.user.service;
 
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import com.mymail.authentication.service.IdentityPolicy;
+import com.mymail.common.ApiException;
 import com.mymail.user.entities.User;
+import com.mymail.user.mappers.UserMapper;
 import com.mymail.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,17 +18,16 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public void requireEmailAvailable(String email) {
         if (userRepository.existsByEmailIgnoreCase(email))
-            throw new com.mymail.common.ApiException(org.springframework.http.HttpStatus.CONFLICT, "ACCOUNT_EXISTS");
+            throw new ApiException(HttpStatus.CONFLICT, "ACCOUNT_EXISTS");
     }
 
     public User saveRegisteredUser(String idpId, String email) {
         return userRepository.findByIdpId(idpId).orElseGet(() -> {
-            User user = new User();
-            user.setIdpId(idpId);
-            user.setEmail(com.mymail.authentication.service.IdentityPolicy.email(email));
+            User user = userMapper.toEntity(idpId, IdentityPolicy.email(email));
             return userRepository.save(user);
         });
     }
@@ -37,9 +41,9 @@ public class UserService {
 
         User user = userRepository.findByIdpId(idpId).orElseGet(() -> createUser(authentication));
         if (user.getIdpId() == null || user.getIdpId().isBlank())
-            throw new org.springframework.security.access.AccessDeniedException("Invalid profile");
-        try { com.mymail.authentication.service.IdentityPolicy.email(user.getEmail()); }
-        catch (RuntimeException ex) { throw new org.springframework.security.access.AccessDeniedException("Invalid profile"); }
+            throw new AccessDeniedException("Invalid profile");
+        try { IdentityPolicy.email(user.getEmail()); }
+        catch (RuntimeException ex) { throw new AccessDeniedException("Invalid profile"); }
         return user;
     }
 
@@ -47,9 +51,7 @@ public class UserService {
         String idpId = authentication.getName();
         String email = getEmail(authentication);
 
-        User user = new User();
-        user.setIdpId(idpId);
-        user.setEmail(com.mymail.authentication.service.IdentityPolicy.email(email));
+        User user = userMapper.toEntity(idpId, IdentityPolicy.email(email));
 
         return userRepository.save(user);
     }
@@ -65,10 +67,10 @@ public class UserService {
         Object email = auth0Authentication.getToken().getClaim("https://mymail.com/email");
 
         if (!(email instanceof String) || email.toString().isBlank()) {
-            throw new org.springframework.security.access.AccessDeniedException("Required email claim missing");
+            throw new AccessDeniedException("Required email claim missing");
         }
 
-        try { return com.mymail.authentication.service.IdentityPolicy.email((String) email); }
-        catch (RuntimeException ex) { throw new org.springframework.security.access.AccessDeniedException("Invalid email claim"); }
+        try { return IdentityPolicy.email((String) email); }
+        catch (RuntimeException ex) { throw new AccessDeniedException("Invalid email claim"); }
     }
 }

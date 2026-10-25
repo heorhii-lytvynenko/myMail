@@ -2,6 +2,9 @@ package com.mymail.authentication.config;
 
 import com.mymail.authentication.service.*;
 import com.mymail.common.ApiErrorResponses;
+import jakarta.servlet.DispatcherType;
+import java.time.Instant;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.http.HttpMethod;
@@ -12,7 +15,6 @@ import org.springframework.security.oauth2.core.*;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
-import java.time.Instant;
 
 @Configuration
 public class SecurityConfig {
@@ -24,7 +26,7 @@ public class SecurityConfig {
     }
     public static OAuth2TokenValidator<Jwt> validators(String issuer, String audience) {
         return new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefaultWithIssuer(issuer),
-                new JwtClaimValidator<java.util.List<String>>("aud", value -> value != null && value.contains(audience)),
+                new JwtClaimValidator<List<String>>("aud", value -> value != null && value.contains(audience)),
                 jwt -> jwt.getExpiresAt() != null && jwt.getExpiresAt().isAfter(Instant.now())
                         && jwt.getSubject() != null && !jwt.getSubject().isBlank()
                         ? OAuth2TokenValidatorResult.success() : OAuth2TokenValidatorResult.failure(
@@ -37,7 +39,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/api/public").permitAll()
                         .requestMatchers(HttpMethod.GET, "/integrations/google/connect", "/integrations/google/callback").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/authentication/login", "/api/authentication/signIn").permitAll()

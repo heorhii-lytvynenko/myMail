@@ -30,9 +30,13 @@ paths:
     $ref: './integrations/google/paths.yaml#/callback'
   /integrations/google/connect:
     $ref: './integrations/google/paths.yaml#/connect'
+
+#
   /integrations/google/emails:
     $ref: './integrations/google/email/paths.yaml#/email'
 
+#  /api/email:
+#    $ref: './email/paths.yaml#/email'
 components:
   schemas:
     ErrorDto:

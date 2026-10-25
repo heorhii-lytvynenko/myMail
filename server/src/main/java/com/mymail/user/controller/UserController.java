@@ -3,7 +3,7 @@ package com.mymail.user.controller;
 import com.mymail.api.UsersApi;
 import com.mymail.api.model.UserResponse;
 import com.mymail.user.entities.User;
-import com.mymail.user.mapper.UserMapper;
+import com.mymail.user.mappers.UserMapper;
 import com.mymail.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,25 +1,10 @@
 package com.mymail.email.service;
 
-import com.mymail.email.providers.EmailProvider;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import com.google.auth.oauth2.AccessToken;
+import com.mymail.email.entities.Email;
+import java.util.List;
 
-@Service
-public class EmailService {
-
-    private final EmailProvider emailProvider;
-
-    public EmailService(
-            @Qualifier("gmailEmailProvider") EmailProvider emailProvider
-    ) {
-        this.emailProvider = emailProvider;
-    }
-
-    public void send(
-            String to,
-            String subject,
-            String html
-    ) {
-        emailProvider.send(to, subject, html);
-    }
+public interface EmailService {
+    List<Email> getEmails(AccessToken accessToken);
+    Email getEmail(AccessToken accessToken, String messageId);
 }

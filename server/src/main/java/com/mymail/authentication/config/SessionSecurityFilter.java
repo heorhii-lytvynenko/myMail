@@ -1,15 +1,15 @@
 package com.mymail.authentication.config;
 
 import com.mymail.authentication.service.*;
-import com.mymail.common.ApiException;
 import com.mymail.common.ApiErrorResponses;
+import com.mymail.common.ApiException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.time.Instant;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
-import java.io.IOException;
-import java.time.Instant;
 
 public class SessionSecurityFilter extends OncePerRequestFilter {
     private final TokenRevocations revocations;

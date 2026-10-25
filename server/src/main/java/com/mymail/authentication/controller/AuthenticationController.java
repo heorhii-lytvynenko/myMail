@@ -1,6 +1,5 @@
 package com.mymail.authentication.controller;
 
-import lombok.RequiredArgsConstructor;
 import com.mymail.api.AuthenticationApi;
 import com.mymail.api.model.LoginRequest;
 import com.mymail.api.model.LoginResponse;
@@ -8,14 +7,16 @@ import com.mymail.api.model.SignInRequest;
 import com.mymail.api.model.SignInResponse;
 import com.mymail.authentication.service.AuthenticationService;
 import jakarta.validation.Valid;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,8 +46,8 @@ public class AuthenticationController implements AuthenticationApi {
 
     @Override
     public ResponseEntity<Void> logout() {
-        var authentication = (org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken)
-                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        var authentication = (JwtAuthenticationToken)
+                SecurityContextHolder.getContext().getAuthentication();
         authenticationService.logout(authentication.getToken());
         return ResponseEntity.noContent().build();
     }

@@ -1,40 +1,46 @@
 package com.mymail.authentication.service;
 
 import com.mymail.api.model.LoginResponse;
+import com.mymail.authentication.mappers.AuthenticationMapper;
 import com.mymail.common.ApiException;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
-
-import java.util.Map;
-
 @Component
 public class Auth0Client {
     private final RestClient client;
+    private final AuthenticationMapper mapper;
     private final JwtDecoder decoder;
     private final String clientId;
     private final String clientSecret;
     private final String audience;
     private final String connection;
 
-    @org.springframework.beans.factory.annotation.Autowired
+    @Autowired
     public Auth0Client(RestClient.Builder builder,
                        @Value("${auth0.domain}") String domain,
                        @Value("${auth0.client-id}") String clientId,
                        @Value("${auth0.client-secret}") String clientSecret,
                        @Value("${auth0.audience}") String audience,
-                       @Value("${auth0.connection}") String connection, JwtDecoder decoder) {
-        this(secureClient(builder, domain), clientId, clientSecret, audience, connection, decoder);
+                       @Value("${auth0.connection}") String connection, JwtDecoder decoder, AuthenticationMapper mapper) {
+        this(secureClient(builder, domain), clientId, clientSecret, audience, connection, decoder, mapper);
     }
 
-    Auth0Client(RestClient client, String clientId, String clientSecret, String audience, String connection, JwtDecoder decoder) {
+    Auth0Client(RestClient client, String clientId, String clientSecret, String audience, String connection, JwtDecoder decoder, AuthenticationMapper mapper) {
+        this.mapper = mapper;
         this.decoder = decoder;
         this.client = client;
         this.clientId = clientId;
@@ -46,9 +52,9 @@ public class Auth0Client {
     private static RestClient secureClient(RestClient.Builder builder, String domain) {
         if (domain.contains("/") || domain.contains("@") || domain.contains(":") || domain.isBlank())
             throw new IllegalStateException("Invalid identity provider hostname");
-        var factory = new org.springframework.http.client.JdkClientHttpRequestFactory(java.net.http.HttpClient.newBuilder()
-                .connectTimeout(java.time.Duration.ofSeconds(5)).followRedirects(java.net.http.HttpClient.Redirect.NEVER).build());
-        factory.setReadTimeout(java.time.Duration.ofSeconds(10));
+        var factory = new JdkClientHttpRequestFactory(HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(5)).followRedirects(HttpClient.Redirect.NEVER).build());
+        factory.setReadTimeout(Duration.ofSeconds(10));
         return builder.requestFactory(factory).baseUrl("https://" + domain).build();
     }
 
@@ -68,13 +74,13 @@ public class Auth0Client {
             if (response.containsKey("expires_in") && !(response.get("expires_in") instanceof Number))
                 throw new IllegalArgumentException();
             var jwt = decoder.decode(token);
-            long remaining = java.time.Duration.between(Instant.now(), jwt.getExpiresAt()).getSeconds();
+            long remaining = Duration.between(Instant.now(), jwt.getExpiresAt()).getSeconds();
             if (response.get("expires_in") instanceof Number duration) {
-                long providerRemaining = duration.longValue() - java.time.Duration.between(started, Instant.now()).getSeconds();
+                long providerRemaining = duration.longValue() - Duration.between(started, Instant.now()).getSeconds();
                 remaining = Math.min(remaining, providerRemaining);
             }
             if (remaining <= 0) throw new IllegalArgumentException();
-            return new LoginResponse().accessToken(token).tokenType("Bearer").expiresIn(remaining);
+            return mapper.toLoginResponse(token, remaining);
         } catch (RuntimeException ex) {
             throw new ApiException(HttpStatus.BAD_GATEWAY, "INVALID_IDENTITY_RESPONSE");
         }
@@ -106,7 +112,7 @@ public class Auth0Client {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "REGISTRATION_REJECTED");
             }
             String providerError = errorCode(ex);
-            if (java.util.Set.of("invalid_client", "unauthorized_client", "unsupported_grant_type", "invalid_request")
+            if (Set.of("invalid_client", "unauthorized_client", "unsupported_grant_type", "invalid_request")
                     .contains(providerError)) throw new ApiException(HttpStatus.BAD_GATEWAY, "IDENTITY_PROVIDER_FAILURE");
             if (!signup && (status == 400 || status == 401 || status == 403)) {
                 throw new ApiException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS");

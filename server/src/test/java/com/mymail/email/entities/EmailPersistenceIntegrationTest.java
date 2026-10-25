@@ -1,14 +1,23 @@
 package com.mymail.email.entities;
 
+import com.google.auth.oauth2.AccessToken;
 import com.mymail.MailApplication;
 import com.mymail.integration.google.entities.GoogleAccount;
 import com.mymail.user.entities.User;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.Validator;
+import java.sql.SQLException;
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -18,13 +27,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import java.sql.SQLException;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -65,11 +67,18 @@ class EmailPersistenceIntegrationTest {
         account.setUser(user);
         account.setGoogleUserId(suffix);
         account.setEmail(suffix + "@gmail.example");
-        account.setAccessToken("test-provider-access");
+        account.setAccessToken(new AccessToken("test-provider-access",
+                Date.from(Instant.now().plusSeconds(3600))));
         account.setRefreshToken("test-provider-refresh");
-        account.setAccessTokenExpiresAt(Instant.now().plusSeconds(3600));
         entities.persist(account);
-        return account;
+        entities.flush();
+        entities.clear();
+        GoogleAccount reloaded = entities.find(GoogleAccount.class, account.getId());
+        assertEquals("test-provider-access", reloaded.getAccessToken().getTokenValue());
+        assertEquals(reloaded.getAccessTokenExpiresAt(), reloaded.getAccessToken().getExpirationTime().toInstant());
+        assertNotEquals("test-provider-access", jdbc.queryForObject(
+                "select access_token from google_accounts where id = ?", String.class, account.getId()));
+        return reloaded;
     }
 
     private GoogleEmailMessage message(GoogleAccount account) {
@@ -152,12 +161,12 @@ class EmailPersistenceIntegrationTest {
                 "to_header", 65535, "subject", 65535, "snippet", 4096);
         for (var field : parentFields.entrySet()) {
             // Column names come only from the fixed test map; field values remain bound parameters.
-            assertThrows(org.springframework.dao.DataIntegrityViolationException.class, () ->
+            assertThrows(DataIntegrityViolationException.class, () ->
                     jdbc.update("update emails set " + field.getKey() + " = ? where id = ?",
                             "x".repeat(field.getValue() + 1), id));
         }
         for (String field : List.of("google_message_id", "google_thread_id")) {
-            assertThrows(org.springframework.dao.DataIntegrityViolationException.class, () ->
+            assertThrows(DataIntegrityViolationException.class, () ->
                     jdbc.update("update google_emails set " + field + " = ? where id = ?", "x".repeat(256), id));
         }
     }

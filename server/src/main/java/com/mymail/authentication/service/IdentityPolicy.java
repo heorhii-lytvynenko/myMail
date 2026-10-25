@@ -1,8 +1,8 @@
 package com.mymail.authentication.service;
 
 import com.mymail.common.ApiException;
-import org.springframework.http.HttpStatus;
 import java.util.Locale;
+import org.springframework.http.HttpStatus;
 
 public final class IdentityPolicy {
     private IdentityPolicy() {}
