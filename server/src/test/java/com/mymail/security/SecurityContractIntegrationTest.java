@@ -119,6 +119,16 @@ class SecurityContractIntegrationTest {
     void status(int expected, MvcResult result) {
         assertEquals(expected, result.getResponse().getStatus());
         assertEquals("no-store", result.getResponse().getHeader("Cache-Control"));
+        if (expected >= 400 && expected != 410) {
+            var error = json.readTree(result.getResponse().getContentAsByteArray());
+            assertEquals(5, error.size());
+            assertFalse(error.get("error").asText().isBlank());
+            assertEquals(expected, error.get("status").asInt());
+            assertEquals(result.getRequest().getRequestURI(), error.get("path").asText());
+            assertNotNull(OffsetDateTime.parse(error.get("timestamp").asText()));
+            assertEquals("Request could not be completed.", error.get("message").asText());
+            assertFalse(error.has("code"));
+        }
     }
     String state(String user) throws Exception {
         // Provision profile before acquiring the integration's per-user row lock.
@@ -370,5 +380,14 @@ class SecurityContractIntegrationTest {
         assertEquals(0, jdbc.queryForObject("select count(*) from google_oauth_states", Integer.class));
         assertEquals(0, jdbc.queryForObject("select count(*) from revoked_access_tokens", Integer.class));
         assertEquals(4, jdbc.queryForObject("select count(*) from databasechangelog", Integer.class));
+    }
+
+    @Test void missingRoutesAndUnimplementedGoogleEmailApiReturnNotFoundDto() throws Exception {
+        for (String path : List.of("/api/unknown", "/integrations/google/emails")) {
+            var result = perform(get(path), alice);
+            status(404, result);
+            assertEquals("NOT_FOUND", json.readTree(result.getResponse().getContentAsByteArray()).get("error").asText());
+        }
+        verifyNoInteractions(google);
     }
 }

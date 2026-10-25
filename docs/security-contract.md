@@ -1,6 +1,6 @@
 # Authentication and Google contract rollout
 
-The source contract is [api.yaml](../api/src/api.yaml). All protected endpoints take `Authorization: Bearer <application JWT>`; Google credentials stay on the backend. See [authentication setup](authentication.md) for credential login, email uniqueness, password policy, rate limits, errors, and logout semantics.
+The source contract is [api.yaml](../api/src/api.yaml). Server errors follow the generated `ErrorDto`: `error` (stable code), `status` (HTTP status), `timestamp` (UTC ISO-8601), `path` (without query parameters), and a safe generic `message`. This replaces the old `code` field; callers should read `error`. MVC handlers and pre-controller security failures use the same serializer and retain no-store, WWW-Authenticate on 401, and Retry-After on 429. All protected endpoints take `Authorization: Bearer <application JWT>`; Google credentials stay on the backend. See [authentication setup](authentication.md) for credential login, email uniqueness, password policy, rate limits, errors, and logout semantics.
 
 ## Endpoints
 
@@ -14,7 +14,7 @@ The source contract is [api.yaml](../api/src/api.yaml). All protected endpoints 
 | `POST /integrations/google/complete` | Authenticated owner-bound completion, 200 connected/email/scopes after persistence |
 | `GET /integrations/google/status` | Authenticated disconnected, connected, or reconnect_required |
 | `DELETE /integrations/google` | Authenticated, idempotent 204 after provider revocation and local removal |
-| `GET /integrations/google/emails` | Authenticated access through a checked/refreshed connection |
+| `GET /integrations/google/emails` | Paginated OpenAPI contract only; no server controller implementation yet |
 | `GET /integrations/google/connect` and `/callback` | 410; no code exchange, redirects, or account attachment |
 
 Authorize accepts `redirectUri`, `codeChallenge` (43 base64url characters), and `codeChallengeMethod: "S256"`. It creates 32 random bytes of unpadded base64url state and persists the authenticated user, exact redirect, challenge/method, expiry and pending status. The only scope requested is `https://www.googleapis.com/auth/gmail.readonly`. The authorization URL uses exactly `https://accounts.google.com/o/oauth2/v2/auth`, response type code, offline access, and consent. Each security parameter occurs once; neither credentials nor a verifier are included.
@@ -81,6 +81,8 @@ Rollback must drain incompatible binaries and preserve the encrypted schema/key;
 The automated suite uses PostgreSQL 17 through Testcontainers, real signed RSA application JWTs with the production validators, the actual Spring Security filter chain, Liquibase, JPA encryption, and mocked provider boundaries. Provider-client tests verify URL/form/header contracts and safe error classification without real accounts. Tests cover credential success/rejection/duplicates/validation/throttling, issuer/signature/audience/expiry, copied-token invalidation, redirect allowlisting, PKCE/ownership/expiry/replay/cancellation, concurrent completion, insufficient scope, refresh retention, status isolation/revocation/outages, idempotent disconnect, durable retries, both completion/disconnect orderings, cleanup and legacy encryption.
 
 Verified locally on 22 October 2026: all 50 tests passed, OpenAPI validation passed, and the complete Gradle build (including compilation and the executable backend JAR) succeeded. The PostgreSQL integration suite executed all four Liquibase changesets and Hibernate schema validation. `git diff --check` passed.
+
+Verified the ErrorDto server update on 25 October 2026: all 56 tests passed, including shared MVC/security error fields, safe messages and paths, HTTP status handling, rate-limit headers, and 404 for the unimplemented Google email route. A clean API generation, OpenAPI validation, and the full Gradle build also passed.
 
 Run `./gradlew :server:test :api:openApiValidate build` with JDK 21 and Docker. Fresh-database startup executes all four Liquibase changesets and Hibernate schema validation. Deployment secrets, live Auth0 policy, Google Cloud callback registration, provider consent, production data collision repair, edge-log redaction and live-provider smoke tests require the respective environments; automated tests do not claim to verify those external settings. The existing Auth0 password contract is preserved; the [hosted-login migration](authentication.md#hosted-login-migration-follow-up) remains a separate coordinated release.
 

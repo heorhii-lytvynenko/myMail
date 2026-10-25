@@ -1,6 +1,6 @@
 email:
   get:
-    tags: [Google Integration]
+    tags: [Google Emails]
     summary: Get Google emails
     description: Retrieves emails
     operationId: getGmailEmails

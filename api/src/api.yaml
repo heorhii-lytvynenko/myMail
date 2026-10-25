@@ -39,6 +39,8 @@ components:
       $ref: './components/schemas.yaml#/ErrorDto'
     UserResponse:
       $ref: './user/schemas.yaml#/UserResponse'
+    BaseListItemResponse:
+      $ref: './components/schemas.yaml#/BaseListItemResponse'
     EmailResponse:
       $ref: './components/schemas.yaml#/EmailResponse'
     PageResponse:

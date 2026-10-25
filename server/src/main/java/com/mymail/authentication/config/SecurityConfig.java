@@ -1,6 +1,7 @@
 package com.mymail.authentication.config;
 
 import com.mymail.authentication.service.*;
+import com.mymail.common.ApiErrorResponses;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.http.HttpMethod;
@@ -31,7 +32,7 @@ public class SecurityConfig {
     }
     @Bean
     SecurityFilterChain apiSecurity(HttpSecurity http, TokenRevocations revocations,
-                                    AuthenticationRateLimiter limiter) throws Exception {
+                                    AuthenticationRateLimiter limiter, ApiErrorResponses errors) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -41,12 +42,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/integrations/google/connect", "/integrations/google/callback").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/authentication/login", "/api/authentication/signIn").permitAll()
                         .anyRequest().authenticated())
-                .exceptionHandling(errors -> errors
-                        .authenticationEntryPoint((req, res, ex) -> SessionSecurityFilter.reject(res, 401, "UNAUTHORIZED"))
-                        .accessDeniedHandler((req, res, ex) -> SessionSecurityFilter.reject(res, 403, "FORBIDDEN")))
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint((req, res, ex) -> errors.write(req, res, 401, "UNAUTHORIZED"))
+                        .accessDeniedHandler((req, res, ex) -> errors.write(req, res, 403, "FORBIDDEN")))
                 .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults())
-                        .authenticationEntryPoint((req, res, ex) -> SessionSecurityFilter.reject(res, 401, "UNAUTHORIZED")))
-                .addFilterAfter(new SessionSecurityFilter(revocations, limiter), BearerTokenAuthenticationFilter.class)
+                        .authenticationEntryPoint((req, res, ex) -> errors.write(req, res, 401, "UNAUTHORIZED")))
+                .addFilterAfter(new SessionSecurityFilter(revocations, limiter, errors), BearerTokenAuthenticationFilter.class)
                 .build();
     }
 }

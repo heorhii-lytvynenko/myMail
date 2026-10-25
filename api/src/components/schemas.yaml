@@ -80,7 +80,7 @@ PageResponse:
 
 EmailResponse:
   allOf:
-    - $ref: './schemas.yaml#/BaseListItemResponse'
+    - $ref: '#/BaseListItemResponse'
   type: object
   required:
     - id
