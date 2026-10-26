@@ -25,7 +25,7 @@ exports.onExecutePostLogin = async (event, api) => {
 };
 ```
 
-Errors contain only a stable `code` and a generic `message`: 400 validation/policy rejection, 401 invalid credentials/session, 403 authenticated access denied, 409 duplicates, 429 throttling with a positive `Retry-After`, and safe 5xx service failures. Sensitive success and error responses use `Cache-Control: no-store`.
+Errors use the generated `ErrorDto` with a stable `error` code, numeric HTTP `status`, UTC ISO-8601 `timestamp`, request `path` without query parameters, and a generic `message`: 400 validation/policy rejection, 401 invalid credentials/session, 403 authenticated access denied, 409 duplicates, 429 throttling with a positive `Retry-After`, and safe 5xx service failures. Sensitive success and error responses use `Cache-Control: no-store`.
 
 Database-backed, fixed one-minute windows apply across backend instances: login 10/email and 100/direct peer IP; signup 5/email and 20/direct peer IP; Google authorization 10/application subject. Caller-supplied forwarding headers are not trusted. The frontend server may share a peer IP with other requests; size edge limits and these thresholds for production traffic. Auth0 throttling is also mapped to 429 with `Retry-After: 60`.
 

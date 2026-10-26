@@ -1,9 +1,18 @@
 package com.mymail.authentication.service;
 
+import com.mymail.authentication.mappers.AuthenticationMapper;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,23 +24,23 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 class Auth0ClientTest {
     private MockRestServiceServer server;
     private Auth0Client client;
-    private org.springframework.security.oauth2.jwt.JwtDecoder decoder;
+    private JwtDecoder decoder;
 
     @BeforeEach
     void setUp() {
         RestClient.Builder builder = RestClient.builder();
         server = MockRestServiceServer.bindTo(builder).build();
-        decoder = org.mockito.Mockito.mock(org.springframework.security.oauth2.jwt.JwtDecoder.class);
-        org.mockito.Mockito.when(decoder.decode(org.mockito.ArgumentMatchers.anyString())).thenReturn(
-                org.springframework.security.oauth2.jwt.Jwt.withTokenValue("test").header("alg", "RS256")
-                        .subject("auth0|123").expiresAt(java.time.Instant.now().plusSeconds(3600)).build());
-        client = new Auth0Client(builder.baseUrl("https://tenant.auth0.com").build(), "client-id", "secret", "api", "database", decoder);
+        decoder = Mockito.mock(JwtDecoder.class);
+        Mockito.when(decoder.decode(ArgumentMatchers.anyString())).thenReturn(
+                Jwt.withTokenValue("test").header("alg", "RS256")
+                        .subject("auth0|123").expiresAt(Instant.now().plusSeconds(3600)).build());
+        client = new Auth0Client(builder.baseUrl("https://tenant.auth0.com").build(), "client-id", "secret", "api", "database", decoder, Mappers.getMapper(AuthenticationMapper.class));
     }
 
     @Test
     void registersAccountInAuth0Database() {
         server.expect(requestTo("https://tenant.auth0.com/dbconnections/signup"))
-                .andExpect(method(org.springframework.http.HttpMethod.POST))
+                .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json("""
                         {"client_id":"client-id","connection":"database",
                          "email":"user@example.com","password":"password123"}
@@ -109,15 +118,15 @@ class Auth0ClientTest {
                 "{\"access_token\":\"signed-token\",\"expires_in\":120}", MediaType.APPLICATION_JSON));
         long lifetime = client.login("user@example.com", "password123").getExpiresIn();
         assertTrue(lifetime > 0 && lifetime <= 120);
-        org.mockito.Mockito.verify(decoder).decode(org.mockito.ArgumentMatchers.anyString());
+        Mockito.verify(decoder).decode(ArgumentMatchers.anyString());
     }
 
     @Test
     void jwtVerificationFailureIsSafeUpstreamFailure() {
         server.expect(requestTo("https://tenant.auth0.com/oauth/token")).andRespond(withSuccess(
                 "{\"access_token\":\"invalid-token\",\"expires_in\":3600}", MediaType.APPLICATION_JSON));
-        org.mockito.Mockito.when(decoder.decode(org.mockito.ArgumentMatchers.anyString()))
-                .thenThrow(new org.springframework.security.oauth2.jwt.JwtException("private details"));
+        Mockito.when(decoder.decode(ArgumentMatchers.anyString()))
+                .thenThrow(new JwtException("private details"));
         var ex = assertThrows(ResponseStatusException.class, () -> client.login("user@example.com", "password123"));
         assertEquals(HttpStatus.BAD_GATEWAY, ex.getStatusCode()); assertNull(ex.getCause());
     }

@@ -1,15 +1,15 @@
 package com.mymail.authentication.service;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.stereotype.Service;
-import org.springframework.scheduling.annotation.Scheduled;
-import lombok.RequiredArgsConstructor;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.HexFormat;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor

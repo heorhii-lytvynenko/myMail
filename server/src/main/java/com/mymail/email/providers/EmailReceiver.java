@@ -1,9 +1,8 @@
 package com.mymail.email.providers;
 
-import com.mymail.model.EmailMessage;
-
+import com.mymail.email.entities.Email;
 import java.util.List;
 
 public interface EmailReceiver {
-    List<EmailMessage> getEmails();
+    List<Email> getEmails();
 }

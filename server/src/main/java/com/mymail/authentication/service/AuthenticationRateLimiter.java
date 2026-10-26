@@ -1,12 +1,12 @@
 package com.mymail.authentication.service;
 
 import com.mymail.common.ApiException;
+import java.sql.Timestamp;
+import java.time.Instant;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
-import java.time.Instant;
-import java.sql.Timestamp;
 
 @Service
 @RequiredArgsConstructor

@@ -4,9 +4,19 @@ import com.mymail.MailApplication;
 import com.mymail.api.model.*;
 import com.mymail.authentication.config.SecurityConfig;
 import com.mymail.authentication.service.Auth0Client;
+import com.mymail.authentication.service.TokenRevocations;
 import com.mymail.common.ApiException;
-import com.mymail.integration.google.service.*;
 import com.mymail.integration.google.repository.GoogleAccountRepository;
+import com.mymail.integration.google.service.*;
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jwt.*;
+import java.security.*;
+import java.security.interfaces.*;
+import java.time.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,15 +36,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.*;
 import tools.jackson.databind.json.JsonMapper;
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.RSASSASigner;
-import com.nimbusds.jwt.*;
-import java.security.*;
-import java.security.interfaces.*;
-import java.time.*;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -79,7 +80,7 @@ class SecurityContractIntegrationTest {
     String bob;
 
     @BeforeEach void setup() throws Exception {
-        jdbc.execute("truncate table google_oauth_states, google_accounts, users, revoked_access_tokens, authentication_rate_limits cascade");
+        jdbc.execute("truncate table emails, google_emails, google_oauth_states, google_accounts, users, revoked_access_tokens, authentication_rate_limits cascade");
         reset(google, auth0);
         alice = token("alice", "alice@example.com", Instant.now().plusSeconds(3600), "https://tenant.invalid/", "mymail-test", KEY);
         bob = token("bob", "bob@example.com", Instant.now().plusSeconds(3600), "https://tenant.invalid/", "mymail-test", KEY);
@@ -119,6 +120,16 @@ class SecurityContractIntegrationTest {
     void status(int expected, MvcResult result) {
         assertEquals(expected, result.getResponse().getStatus());
         assertEquals("no-store", result.getResponse().getHeader("Cache-Control"));
+        if (expected >= 400 && expected != 410) {
+            var error = json.readTree(result.getResponse().getContentAsByteArray());
+            assertEquals(5, error.size());
+            assertFalse(error.get("error").asText().isBlank());
+            assertEquals(expected, error.get("status").asInt());
+            assertEquals(result.getRequest().getRequestURI(), error.get("path").asText());
+            assertNotNull(OffsetDateTime.parse(error.get("timestamp").asText()));
+            assertEquals("Request could not be completed.", error.get("message").asText());
+            assertFalse(error.has("code"));
+        }
     }
     String state(String user) throws Exception {
         // Provision profile before acquiring the integration's per-user row lock.
@@ -366,9 +377,35 @@ class SecurityContractIntegrationTest {
         state(alice);
         jdbc.update("update google_oauth_states set expires_at = current_timestamp - interval '1 minute'");
         jdbc.update("insert into revoked_access_tokens(token_hash, expires_at) values (?, current_timestamp - interval '1 minute')", "0".repeat(64));
-        new com.mymail.authentication.service.TokenRevocations(jdbc).cleanup();
+        new TokenRevocations(jdbc).cleanup();
         assertEquals(0, jdbc.queryForObject("select count(*) from google_oauth_states", Integer.class));
         assertEquals(0, jdbc.queryForObject("select count(*) from revoked_access_tokens", Integer.class));
-        assertEquals(4, jdbc.queryForObject("select count(*) from databasechangelog", Integer.class));
+        assertEquals(8, jdbc.queryForObject("select count(*) from databasechangelog", Integer.class));
+    }
+
+    @Test void missingRoutesAndUnimplementedGoogleEmailApiReturnNotFoundDto() throws Exception {
+        for (String path : List.of("/api/unknown", "/integrations/google/emails")) {
+            var result = perform(get(path), alice);
+            status(404, result);
+            assertEquals("NOT_FOUND", json.readTree(result.getResponse().getContentAsByteArray()).get("error").asText());
+        }
+        verifyNoInteractions(google);
+    }
+
+    @Test void disconnectRemovesCachedActiveAndSoftDeletedMessageRows() throws Exception {
+        connect();
+        UUID accountId = jdbc.queryForObject("select id from google_accounts", UUID.class);
+        for (boolean deleted : List.of(false, true)) {
+            UUID id = UUID.randomUUID();
+            jdbc.update("insert into emails(id, thread_id, created_at, created_by, version) values (?, ?, current_timestamp, 'test', 0)",
+                    id, "cached-thread");
+            jdbc.update("insert into google_emails(id, google_message_id, google_thread_id, google_account_id) values (?, ?, ?, ?)",
+                    id, "cached-message-" + deleted, "cached-thread", accountId);
+            if (deleted) jdbc.update("update emails set deleted_at = current_timestamp, deleted_by = 'test' where id = ?", id);
+        }
+        status(204, perform(delete("/integrations/google"), alice));
+        assertEquals(0, jdbc.queryForObject("select count(*) from google_emails", Integer.class));
+        assertEquals(0, jdbc.queryForObject("select count(*) from emails", Integer.class));
+        status(204, perform(delete("/integrations/google"), alice));
     }
 }

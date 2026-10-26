@@ -1,0 +1,57 @@
+email:
+  get:
+    tags: [Google Emails]
+    summary: Get Google emails
+    description: Retrieves cached emails for the authenticated user's connected Google account. Checks local ownership and connection state without calling Google. Does not synchronize Gmail. Invalid, duplicate, or out-of-range page/size values return 400.
+    operationId: getGmailEmails
+    security:
+      - bearerAuth: []
+    x-spring-paginated: true
+    parameters:
+      - $ref: '../../../components/parameters.yaml#/Page'
+      - $ref: '../../../components/parameters.yaml#/Size'
+      - name: sort
+        in: query
+        required: false
+        description: "Sorting in Spring Pageable format. Allowed fields: id, threadId, from, to, subject, snippet, receivedAt. Defaults to receivedAt descending; id is appended for stable ordering."
+        schema:
+          type: array
+          items:
+            type: string
+        style: form
+        explode: true
+    responses:
+      '200':
+        description: Emails retrieved successfully
+        headers:
+          Cache-Control:
+            schema:
+              type: string
+              enum: [ no-store ]
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/GetGoogleEmailsResponse'
+      '401':
+        $ref: '../../../components/errors.yaml#/Unauthorized'
+      '400':
+        $ref: '../../../components/errors.yaml#/BadRequest'
+      '403':
+        $ref: '../../../components/errors.yaml#/Forbidden'
+      '404':
+        description: No Google account is connected for the authenticated user (GOOGLE_DISCONNECTED).
+        content:
+          application/json:
+            schema:
+              $ref: '../../../components/schemas.yaml#/ErrorDto'
+      '409':
+        $ref: '../../../components/errors.yaml#/Conflict'
+      '429':
+        $ref: '../../../components/errors.yaml#/TooManyRequests'
+      '500':
+        $ref: '../../../components/errors.yaml#/InternalServerError'
+      '502':
+        $ref: '../../../components/errors.yaml#/ServiceFailure'
+      '503':
+        $ref: '../../../components/errors.yaml#/ServiceFailure'
+

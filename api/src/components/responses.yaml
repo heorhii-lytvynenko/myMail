@@ -1,0 +1,6 @@
+Created:
+  description: Resource created successfully
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/PostResponse'

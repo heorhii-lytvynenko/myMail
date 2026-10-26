@@ -1,14 +1,18 @@
 package com.mymail.integration.google.service;
 
 import com.mymail.common.ApiException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import org.junit.jupiter.api.*;
 import org.springframework.http.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import java.net.URI;
-import java.util.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
@@ -33,13 +37,13 @@ class GoogleOAuthServiceTest {
         assertEquals(expected.size(), params.size());
         expected.forEach((key, value) -> {
             assertEquals(1, params.get(key).size());
-            assertTrue(java.net.URLDecoder.decode(params.getFirst(key), java.nio.charset.StandardCharsets.UTF_8).equals(value));
+            assertTrue(URLDecoder.decode(params.getFirst(key), StandardCharsets.UTF_8).equals(value));
         });
     }
     @Test void exchangeSendsOriginalRedirectAndVerifierOnlyInFormBody() {
         server.expect(requestTo("https://oauth2.googleapis.com/token"))
                 .andExpect(method(HttpMethod.POST)).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(content().formData(new org.springframework.util.LinkedMultiValueMap<>(Map.of(
+                .andExpect(content().formData(new LinkedMultiValueMap<>(Map.of(
                         "grant_type", List.of("authorization_code"), "code", List.of("code"), "code_verifier", List.of("v".repeat(43)),
                         "redirect_uri", List.of("https://example.com/callback"), "client_id", List.of("client"), "client_secret", List.of("secret")))))
                 .andRespond(withSuccess("{\"access_token\":\"access\",\"expires_in\":3600,\"token_type\":\"Bearer\",\"scope\":\"" + GoogleSettings.SCOPE + "\"}", MediaType.APPLICATION_JSON));
@@ -98,7 +102,7 @@ class GoogleOAuthServiceTest {
         assertThrows(IllegalStateException.class, () -> new GoogleOAuthService(RestClient.builder(), "client", "", true));
         assertThrows(IllegalStateException.class, () -> new CredentialCipher("", true));
         assertThrows(IllegalStateException.class, () -> new CredentialCipher("invalid", false));
-        assertThrows(com.mymail.common.ApiException.class, () -> new GoogleSettings(false,
+        assertThrows(ApiException.class, () -> new GoogleSettings(false,
                 "https://my-mail-front.vercel.app/api/integrations/google/callback").requireEnabled());
     }
 }

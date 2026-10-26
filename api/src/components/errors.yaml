@@ -1,49 +1,59 @@
 BadRequest:
-  description: Validation rejected or invalid/expired/replayed OAuth transaction.
-  headers:
-    Cache-Control:
-      schema:
-        type: string
-        enum: [no-store]
+  description: Bad Request
   content:
     application/json:
       schema:
-        $ref: './schemas.yaml#/ApiError'
+        $ref: './schemas.yaml#/ErrorDto'
+
 Unauthorized:
-  description: Missing, invalid, expired, or revoked application session.
-  headers:
-    Cache-Control:
-      schema:
-        type: string
-        enum: [no-store]
+  description: Unauthorized
   content:
     application/json:
       schema:
-        $ref: './schemas.yaml#/ApiError'
+        $ref: './schemas.yaml#/ErrorDto'
+
 Forbidden:
-  description: Authenticated identity denied access or transaction ownership mismatch.
-  headers:
-    Cache-Control:
-      schema:
-        type: string
-        enum: [no-store]
+  description: Forbidden
   content:
     application/json:
       schema:
-        $ref: './schemas.yaml#/ApiError'
+        $ref: './schemas.yaml#/ErrorDto'
+
 NotFound:
-  description: Resource not found.
-Conflict:
-  description: Duplicate account or pending disconnect.
-  headers:
-    Cache-Control:
-      schema:
-        type: string
-        enum: [no-store]
+  description: Not Found
   content:
     application/json:
       schema:
-        $ref: './schemas.yaml#/ApiError'
+        $ref: './schemas.yaml#/ErrorDto'
+
+Conflict:
+  description: Conflict
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/ErrorDto'
+
+UnprocessableEntity:
+  description: Unprocessable Entity
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/ErrorDto'
+
+UnsupportedMediaType:
+  description: Unsupported Media Type
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/ErrorDto'
+
+InternalServerError:
+  description: Internal Server Error
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yaml#/ErrorDto'
+
 TooManyRequests:
   description: Rate limit exceeded.
   headers:
@@ -58,7 +68,8 @@ TooManyRequests:
   content:
     application/json:
       schema:
-        $ref: './schemas.yaml#/ApiError'
+        $ref: './schemas.yaml#/ErrorDto'
+
 ServiceFailure:
   description: Upstream or backend service unavailable; no provider details exposed.
   headers:
@@ -69,4 +80,4 @@ ServiceFailure:
   content:
     application/json:
       schema:
-        $ref: './schemas.yaml#/ApiError'
+        $ref: './schemas.yaml#/ErrorDto'

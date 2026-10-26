@@ -1,0 +1,14 @@
+GetGoogleEmailsResponse:
+  type: object
+  required:
+    - content
+    - page
+  properties:
+    content:
+      type: array
+      items:
+        $ref: '../../../components/schemas.yaml#/EmailResponse'
+    page:
+      $ref: '../../../components/schemas.yaml#/PageResponse'
+
+
